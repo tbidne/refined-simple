@@ -53,6 +53,8 @@ common common-exts
   default-extensions:
     DataKinds
     DerivingVia
+    FlexibleContexts
+    FlexibleInstances
     ImportQualifiedPost
     MultiParamTypeClasses
     PatternSynonyms
@@ -64,7 +66,10 @@ common common-exts
 
 library
   import:           common-exts
-  exposed-modules:  Refined
+  exposed-modules:
+    Refined
+    Refined.Internal
+    Refined.Predicate
   build-depends:
     , base              >=4.14.0.0 && <4.17
     , template-haskell  >=2.16.0.0 && <2.18
