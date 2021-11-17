@@ -1,0 +1,55 @@
+cabal-version:      2.4
+name:               refined-simple
+version:            0.1.0.0
+license:            MIT
+license-file:       LICENSE
+copyright:          2021 Thomas Bidne
+author:             Thomas Bidne
+maintainer:         tbidne@prontonmail.com
+homepage:           https://github.com/tbidne/refined-simple/
+bug-reports:        https://github.com/tbidne/refined-simple/issues
+synopsis:
+  A library that provides a simple implementation of refined types.
+
+description:
+  @refined-simple@ provides a simple implementation of refined types with
+  a small dependency footprint. Its main inspirations are the wonderful
+  @refine@ and @facts@ packages.
+  .
+  Differences from @refined@:
+  .
+  * Only dependency is @TemplateHaskell@, giving @refined-simple@ a
+  significantly lighter dependency footprint.
+  * Predicate composition is a type-level list (like @facts@), not a
+  combination of logical operators. This makes composition less general
+  than @refined@'s, but it is simpler and easier to work with.
+  * @refined-simple@ provides fewer built-in predicates.
+  .
+  Differences from @facts@:
+  .
+  * Fewer dependencies (though @facts@ is also light).
+  * Simpler API.
+  .
+  In short: If you want a "batteries included" refined library with the
+  highest ecosystem integration and most flexible composition (and don't
+  mind some transitive dependencies you may not use e.g. aeson), check out
+  @refined@. If instead you want a more compact design with a strong
+  mathematical foundation, try @facts@. Finally, if you would ordinarily
+  use smart constructors but are tired of some of the shortcomings
+  (e.g. high boilerplate, no safe creation for compile-time constants,
+  constants, no composition), then perhaps give @refined-simple@ a try.
+
+category:           Refined Types
+extra-source-files:
+  CHANGELOG.md
+  README.md
+
+source-repository head
+  type:     git
+  location: https://github.com/tbidne/refined-simple
+
+library
+  exposed-modules:  Refined
+  build-depends:    base ^>=4.14.0.0
+  hs-source-dirs:   src
+  default-language: Haskell2010
