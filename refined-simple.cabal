@@ -3,6 +3,7 @@ name:               refined-simple
 version:            0.1.0.0
 license:            MIT
 license-file:       LICENSE
+tested-with:        GHC ==8.10.7 || ==9.0.1
 copyright:          2021 Thomas Bidne
 author:             Thomas Bidne
 maintainer:         tbidne@prontonmail.com
@@ -48,8 +49,25 @@ source-repository head
   type:     git
   location: https://github.com/tbidne/refined-simple
 
+common common-exts
+  default-extensions:
+    DataKinds
+    DerivingVia
+    ImportQualifiedPost
+    MultiParamTypeClasses
+    PatternSynonyms
+    ScopedTypeVariables
+    StandaloneKindSignatures
+    TypeApplications
+    TypeFamilies
+    TypeOperators
+
 library
+  import:           common-exts
   exposed-modules:  Refined
-  build-depends:    base ^>=4.14.0.0
+  build-depends:
+    , base              >=4.14.0.0 && <4.17
+    , template-haskell  >=2.16.0.0 && <2.18
+
   hs-source-dirs:   src
   default-language: Haskell2010
