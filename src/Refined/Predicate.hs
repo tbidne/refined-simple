@@ -43,15 +43,15 @@ class (Typeable p, Typeable a) => Predicate p a where
   -- @since 0.1.0.0
   validate :: Proxy p -> a -> Maybe RefineException
 
--- | @mkRefineException \@a \@p msg@ creates a 'RefineException' for type @a@,
+-- | @mkRefineException \@p \@a msg@ creates a 'RefineException' for type @a@,
 -- predicate @p@, and error message @msg@.
 --
 -- @since 0.1.0.0
 mkRefineException :: forall p a. Predicate p a => String -> RefineException
-mkRefineException = MkRefineException aTy pTy
+mkRefineException = MkRefineException pTy aTy
   where
-    aTy = Ty.typeRep (Proxy @a)
     pTy = Ty.typeRep (Proxy @p)
+    aTy = Ty.typeRep (Proxy @a)
 
 -- | Predicate for @x = 'NotEquals' n@ implies \(x \ne n \).
 --

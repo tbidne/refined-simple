@@ -51,14 +51,14 @@ pattern MkRefined a <- UnsafeRefined a
 --
 -- @since 0.1.0.0
 data RefineException = MkRefineException
-  { -- | Type rep for the type to which we tried to apply the refinement.
-    --
-    -- @since 0.1.0.0
-    targetRep :: TypeRep,
-    -- | Type rep for the predicate we tried to apply.
+  { -- | Type rep for the predicate we tried to apply.
     --
     -- @since 0.1.0.0
     predRep :: TypeRep,
+    -- | Type rep for the type to which we tried to apply the refinement.
+    --
+    -- @since 0.1.0.0
+    targetRep :: TypeRep,
     -- | Description of the error encountered.
     --
     -- @since 0.1.0.0

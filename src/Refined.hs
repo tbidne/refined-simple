@@ -39,7 +39,7 @@ module Refined
     Even,
     Odd,
 
-    -- * Specializations
+    -- ** Specializations
     NonZero,
     NonNegative,
     Positive,
@@ -94,12 +94,13 @@ refineEmpty = UnsafeRefined
 --
 -- >>> let x = refine @Positive @Int 5
 -- >>> :type x
--- >>> x
 -- x :: Either RefineException (Refined '[Positive] Int)
+--
+-- >>> x
 -- Right (UnsafeRefined {unrefine = 5})
 --
 -- >>> refine @Positive 0
--- Left (MkRefineException {targetRep = Integer, predRep = GreaterThan 0, msg = "0 does not satisfy > 0"})
+-- Left (MkRefineException {predRep = GreaterThan 0, targetRep = Integer, msg = "0 does not satisfy > 0"})
 --
 -- @since 0.1.0.0
 refine :: forall p a. Predicate p a => a -> Either RefineException (Refined '[p] a)
@@ -121,9 +122,6 @@ refineTH x = case validate @p Proxy x of
 -- >>> unsafeRefine @NonNegative 0
 -- UnsafeRefined {unrefine = 0}
 --
--- >>> unsafeRefine @NonNegative (-2)
--- Error validating Predicate in unsafeRefined: MkRefineException {targetRep = Integer, predRep = GreaterThanEq 0, msg = "-2 does not satisfy >= 0"}
---
 -- @since 0.1.0.0
 unsafeRefine :: forall p a. Predicate p a => a -> Refined '[p] a
 unsafeRefine x = case validate @p Proxy x of
@@ -136,14 +134,15 @@ unsafeRefine x = case validate @p Proxy x of
 -- >>> let x = unsafeRefine @NonNegative @Int 7
 -- >>>     y = prove @NonZero x
 -- >>> :type y
--- >>> y
 -- y :: Either
 --        RefineException (Refined '[GreaterThanEq 0, NotEquals 0] Int)
+--
+-- >>> y
 -- Right (UnsafeRefined {unrefine = 7})
 --
 -- >>> let z = prove @Even x
 -- >>> z
--- Left (MkRefineException {targetRep = Int, predRep = Even, msg = "7 is not even"})
+-- Left (MkRefineException {predRep = Even, targetRep = Int, msg = "7 is not even"})
 --
 -- @since 0.1.0.0
 prove :: forall p ps a. Predicate p a => Refined ps a -> Either RefineException (Refined (AppendP p ps) a)
@@ -157,13 +156,10 @@ prove (MkRefined x) = case validate @p Proxy x of
 -- >>> let x = unsafeRefine @NonNegative @Int 7
 -- >>>     y = unsafeProve @NonZero x
 -- >>> :type y
--- >>> y
 -- y :: Refined '[GreaterThanEq 0, NotEquals 0] Int
--- UnsafeRefined {unrefine = 7}
 --
--- >>> let z = unsafeProve @Even x
--- >>> z
--- MkRefineException {targetRep = Int, predRep = Even, msg = "7 is not even"}
+-- >>> y
+-- UnsafeRefined {unrefine = 7}
 --
 -- @since 0.1.0.0
 unsafeProve :: forall p ps a. Predicate p a => Refined ps a -> Refined (AppendP p ps) a
@@ -187,8 +183,9 @@ relax (MkRefined x) = UnsafeRefined x
 -- >>> let x = unsafeRefine @Even @Int 8
 -- >>>     y = unsafeProve @Positive x
 -- >>> :type y
--- >>> :type (relaxAll y)
 -- y :: Refined '[Even, GreaterThan 0] Int
+--
+-- >>> :type (relaxAll y)
 -- (relaxAll y) :: Refined '[] Int
 --
 -- @since 0.1.0.0
@@ -202,10 +199,6 @@ relaxAll (MkRefined x) = UnsafeRefined x
 -- >>> let d = unsafeRefine @NonZero @Int 7
 -- >>> safeDiv 14 d
 -- 2
---
--- >>> -- compile-time error!
--- >>> safeDiv 14 (refineEmpty 7)
--- Desired predicate NotEquals 0 was not found in list '[]
 --
 -- @since 0.1.0.0
 type Implies :: [Type] -> Type -> Constraint

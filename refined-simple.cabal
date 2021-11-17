@@ -70,9 +70,22 @@ library
     Refined
     Refined.Internal
     Refined.Predicate
+
   build-depends:
     , base              >=4.14.0.0 && <4.17
     , template-haskell  >=2.16.0.0 && <2.18
 
   hs-source-dirs:   src
+  default-language: Haskell2010
+
+test-suite doctest
+  import:           common-exts
+  type:             exitcode-stdio-1.0
+  main-is:          Main.hs
+  build-depends:
+    , base
+    , doctest         >=0.16.3 && <0.21
+    , refined-simple
+
+  hs-source-dirs:   test/doctest
   default-language: Haskell2010
