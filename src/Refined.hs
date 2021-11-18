@@ -21,8 +21,8 @@ module Refined
     Predicate (..),
 
     -- ** Proving
-    prove,
-    unsafeProve,
+    addPred,
+    unsafeAddPred,
     relax,
     relaxAll,
 
@@ -31,20 +31,25 @@ module Refined
     PredNotFound,
 
     -- ** Built-In
+
+    -- *** Math
     NotEquals,
+    NonZero,
     GreaterThanEq,
+    NonNegative,
     GreaterThan,
+    Positive,
     LessThanEq,
+    NonPositive,
     LessThan,
+    Negative,
     Even,
     Odd,
 
-    -- ** Specializations
-    NonZero,
-    NonNegative,
-    Positive,
-    NonPositive,
-    Negative,
+    -- *** Foldable
+    MaxLength,
+    SortedAsc,
+    SortedDesc,
 
     -- * Misc Utils
     AppendP,
@@ -66,6 +71,7 @@ import Refined.Predicate
     GreaterThanEq,
     LessThan,
     LessThanEq,
+    MaxLength,
     Negative,
     NonNegative,
     NonPositive,
@@ -74,6 +80,8 @@ import Refined.Predicate
     Odd,
     Positive,
     Predicate (..),
+    SortedAsc,
+    SortedDesc,
   )
 import Refined.Predicate qualified as Predicate
 
@@ -108,7 +116,7 @@ refine x = case validate @p Proxy x of
   Nothing -> Right $ UnsafeRefined x
   Just ex -> Left ex
 
--- | Proves @p@ at compile-time via @TemplateHaskell@.
+-- | addPreds @p@ at compile-time via @TemplateHaskell@.
 --
 -- @since 0.1.0.0
 refineTH :: forall p a. (Predicate p a, Lift a) => a -> Q (TExp (Refined '[p] a))
@@ -116,7 +124,7 @@ refineTH x = case validate @p Proxy x of
   Nothing -> TH.TExp <$> TH.lift (UnsafeRefined x)
   Just err -> error $ "Error validating Predicate in mkRefinedTH: " <> show err
 
--- | Attempts to prove the given predicate. If it succeeds, we return the
+-- | Attempts to addPred the given predicate. If it succeeds, we return the
 -- refined @a@. Otherwise we die with a runtime error.
 --
 -- >>> unsafeRefine @NonNegative 0
@@ -128,11 +136,11 @@ unsafeRefine x = case validate @p Proxy x of
   Nothing -> UnsafeRefined x
   Just err -> error $ "Error validating Predicate in unsafeRefined: " <> show err
 
--- | Attempts to prove the given predicate. If it succeeds, we add the
+-- | Attempts to addPred the given predicate. If it succeeds, we add the
 -- predicate to the list.
 --
 -- >>> let x = unsafeRefine @NonNegative @Int 7
--- >>>     y = prove @NonZero x
+-- >>>     y = addPred @NonZero x
 -- >>> :type y
 -- y :: Either
 --        RefineException (Refined '[GreaterThanEq 0, NotEquals 0] Int)
@@ -140,21 +148,21 @@ unsafeRefine x = case validate @p Proxy x of
 -- >>> y
 -- Right (UnsafeRefined {unrefine = 7})
 --
--- >>> let z = prove @Even x
+-- >>> let z = addPred @Even x
 -- >>> z
 -- Left (MkRefineException {predRep = Even, targetRep = Int, msg = "7 is not even"})
 --
 -- @since 0.1.0.0
-prove :: forall p ps a. Predicate p a => Refined ps a -> Either RefineException (Refined (AppendP p ps) a)
-prove (MkRefined x) = case validate @p Proxy x of
+addPred :: forall p ps a. Predicate p a => Refined ps a -> Either RefineException (Refined (AppendP p ps) a)
+addPred (MkRefined x) = case validate @p Proxy x of
   Nothing -> Right $ UnsafeRefined x
   Just ex -> Left ex
 
--- | Attempts to prove the given predicate. If it succeeds, we add the
+-- | Attempts to addPred the given predicate. If it succeeds, we add the
 -- predicate to the list.
 --
 -- >>> let x = unsafeRefine @NonNegative @Int 7
--- >>>     y = unsafeProve @NonZero x
+-- >>>     y = unsafeAddPred @NonZero x
 -- >>> :type y
 -- y :: Refined '[GreaterThanEq 0, NotEquals 0] Int
 --
@@ -162,8 +170,8 @@ prove (MkRefined x) = case validate @p Proxy x of
 -- UnsafeRefined {unrefine = 7}
 --
 -- @since 0.1.0.0
-unsafeProve :: forall p ps a. Predicate p a => Refined ps a -> Refined (AppendP p ps) a
-unsafeProve (MkRefined x) = case validate @p Proxy x of
+unsafeAddPred :: forall p ps a. Predicate p a => Refined ps a -> Refined (AppendP p ps) a
+unsafeAddPred (MkRefined x) = case validate @p Proxy x of
   Nothing -> UnsafeRefined x
   Just ex -> error $ show ex
 
@@ -181,7 +189,7 @@ relax (MkRefined x) = UnsafeRefined x
 -- | Removes all predicates.
 --
 -- >>> let x = unsafeRefine @Even @Int 8
--- >>>     y = unsafeProve @Positive x
+-- >>>     y = unsafeAddPred @Positive x
 -- >>> :type y
 -- y :: Refined '[Even, GreaterThan 0] Int
 --
