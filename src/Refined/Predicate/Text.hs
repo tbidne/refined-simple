@@ -15,7 +15,16 @@ import Data.Text qualified as T
 import Refined.Predicate.Class (Predicate (..))
 import Refined.Predicate.Class qualified as PC
 
+-- $setup
+-- >>> import Data.Proxy (Proxy (..))
+
 -- | Predicate for text with alpha characters only.
+--
+-- >>> validate @Alpha Proxy "cat"
+-- Nothing
+--
+-- >>> validate @Alpha Proxy "cat5"
+-- Just (MkRefineException {predRep = Alpha, targetRep = [Char], msg = "\"cat5\" is not alphabetic characters"})
 --
 -- @since 0.1.0.0
 type Alpha :: Type
@@ -39,6 +48,12 @@ instance Predicate Alpha String where
 
 -- | Predicate for text with numeric characters only.
 --
+-- >>> validate @Numeric Proxy "123"
+-- Nothing
+--
+-- >>> validate @Numeric Proxy "123abc"
+-- Just (MkRefineException {predRep = Alpha, targetRep = [Char], msg = "\"123abc\" is not numeric characters"})
+--
 -- @since 0.1.0.0
 type Numeric :: Type
 data Numeric
@@ -49,7 +64,7 @@ instance Predicate Numeric Text where
     | T.all C.isNumber txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Alpha @Text err
     where
-      err = show txt <> " is not alphabetic characters"
+      err = show txt <> " is not numeric characters"
 
 -- | @since 0.1.0.0
 instance Predicate Numeric String where
@@ -57,9 +72,15 @@ instance Predicate Numeric String where
     | all C.isNumber txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Alpha @String err
     where
-      err = show txt <> " is not alphabetic characters"
+      err = show txt <> " is not numeric characters"
 
 -- | Predicate for text with alpha or numeric characters only.
+--
+-- >>> validate @AlphaNumeric Proxy "abc123"
+-- Nothing
+--
+-- >>> validate @AlphaNumeric Proxy "abc123!"
+-- Just (MkRefineException {predRep = Alpha, targetRep = [Char], msg = "\"abc123!\" is not alpha-numeric characters"})
 --
 -- @since 0.1.0.0
 type AlphaNumeric :: Type
@@ -83,6 +104,12 @@ instance Predicate AlphaNumeric String where
 
 -- | Predicate for lower-case text only.
 --
+-- >>> validate @Lower Proxy "cat"
+-- Nothing
+--
+-- >>> validate @Lower Proxy "CAT"
+-- Just (MkRefineException {predRep = Alpha, targetRep = [Char], msg = "\"CAT\" is not lowercase"})
+--
 -- @since 0.1.0.0
 type Lower :: Type
 data Lower
@@ -104,6 +131,12 @@ instance Predicate Lower String where
       err = show txt <> " is not lowercase"
 
 -- | Predicate for lower-case text only.
+--
+-- >>> validate @Upper Proxy "CAT"
+-- Nothing
+--
+-- >>> validate @Upper Proxy "cat"
+-- Just (MkRefineException {predRep = Alpha, targetRep = [Char], msg = "\"cat\" is not uppercase"})
 --
 -- @since 0.1.0.0
 type Upper :: Type

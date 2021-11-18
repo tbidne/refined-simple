@@ -26,6 +26,12 @@ import Refined.Predicate.Class qualified as PC
 
 -- | Predicate for @x = 'NotEquals' n@ implies \(x \ne n \).
 --
+-- >>> validate @(NotEquals 5) Proxy 10
+-- Nothing
+--
+-- >>> validate @(NotEquals 5) Proxy 5
+-- Just (MkRefineException {predRep = NotEquals 5, targetRep = Integer, msg = "5 does not satisfy /= 5"})
+--
 -- @since 0.1.0.0
 type NotEquals :: Nat -> Type
 data NotEquals n
@@ -48,6 +54,12 @@ instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate
 
 -- | Predicate for @x = 'GreaterThanEq' n@ implies \(x \geq n \).
 --
+-- >>> validate @(GreaterThanEq 5) Proxy 5
+-- Nothing
+--
+-- >>> validate @(GreaterThanEq 5) Proxy 4
+-- Just (MkRefineException {predRep = GreaterThanEq 5, targetRep = Integer, msg = "4 does not satisfy >= 5"})
+--
 -- @since 0.1.0.0
 type GreaterThanEq :: Nat -> Type
 data GreaterThanEq n
@@ -67,6 +79,12 @@ instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate
       err = show x <> " does not satisfy >= " <> show n'
 
 -- | Predicate for @x = 'GreaterThan' n@ implies \(x > n \).
+--
+-- >>> validate @(GreaterThan 5) Proxy 6
+-- Nothing
+--
+-- >>> validate @(GreaterThan 5) Proxy 5
+-- Just (MkRefineException {predRep = GreaterThan 5, targetRep = Integer, msg = "5 does not satisfy > 5"})
 --
 -- @since 0.1.0.0
 type GreaterThan :: Nat -> Type
@@ -88,6 +106,12 @@ type Positive = GreaterThan 0
 
 -- | Predicate for @x = 'LessThanEq' n@ implies \(x \leq n \).
 --
+-- >>> validate @(LessThanEq 5) Proxy 5
+-- Nothing
+--
+-- >>> validate @(LessThanEq 5) Proxy 6
+-- Just (MkRefineException {predRep = LessThanEq 5, targetRep = Integer, msg = "6 does not satisfy <= 5"})
+--
 -- @since 0.1.0.0
 type LessThanEq :: Nat -> Type
 data LessThanEq n
@@ -106,6 +130,12 @@ instance
       err = show x <> " does not satisfy <= " <> show n'
 
 -- | Predicate for @x = 'LessThan' n@ implies \(x < n \).
+--
+-- >>> validate @(LessThan 5) Proxy 4
+-- Nothing
+--
+-- >>> validate @(LessThan 5) Proxy 5
+-- Just (MkRefineException {predRep = LessThan 5, targetRep = Integer, msg = "5 does not satisfy < 5"})
 --
 -- @since 0.1.0.0
 type LessThan :: Nat -> Type
@@ -126,6 +156,12 @@ instance
 
 -- | Predicate for non-positive types, i.e. \(n \leq 0\).
 --
+-- >>> validate @NonPositive Proxy 0
+-- Nothing
+--
+-- >>> validate @NonPositive Proxy 1
+-- Just (MkRefineException {predRep = NonPositive, targetRep = Integer, msg = "1 does not satisfy <= 0"})
+--
 -- @since 0.1.0.0
 data NonPositive
 
@@ -142,6 +178,12 @@ instance
       err = show x <> " does not satisfy <= 0"
 
 -- | Predicate for non-positive types, i.e. \(n < 0\).
+--
+-- >>> validate @Negative Proxy (-2)
+-- Nothing
+--
+-- >>> validate @Negative Proxy 0
+-- Just (MkRefineException {predRep = Negative, targetRep = Integer, msg = "0 does not satisfy < 0"})
 --
 -- @since 0.1.0.0
 data Negative
@@ -160,6 +202,12 @@ instance
 
 -- | Predicate for even integral types.
 --
+-- >>> validate @Even Proxy 4
+-- Nothing
+--
+-- >>> validate @Even Proxy 7
+-- Just (MkRefineException {predRep = Even, targetRep = Integer, msg = "7 is not even"})
+--
 -- @since 0.1.0.0
 type Even :: Type
 data Even
@@ -173,6 +221,12 @@ instance forall a. (Integral a, Show a, Typeable a) => Predicate Even a where
       err = show x <> " is not even"
 
 -- | Predicate for odd integral types.
+--
+-- >>> validate @Odd Proxy 5
+-- Nothing
+--
+-- >>> validate @Odd Proxy 4
+-- Just (MkRefineException {predRep = Odd, targetRep = Integer, msg = "4 is not odd"})
 --
 -- @since 0.1.0.0
 type Odd :: Type

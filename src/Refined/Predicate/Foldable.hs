@@ -3,6 +3,7 @@
 -- | Provides predicates for 'Foldable'.
 module Refined.Predicate.Foldable
   ( MaxLength,
+    MinLength,
     SortedAsc,
     SortedDesc,
   )
@@ -19,6 +20,12 @@ import Refined.Predicate.Class (Predicate (..))
 import Refined.Predicate.Class qualified as PC
 
 -- | Predicate for maximum length.
+--
+-- >>> validate @(MaxLength 10) Proxy [1..10]
+-- Nothing
+--
+-- >>> validate @(MaxLength 10) Proxy [1..11]
+-- Just (MkRefineException {predRep = MaxLength 10, targetRep = [Integer], msg = "[1,2,3,4,5,6,7,8,9,10,11] does not satisfy length <= 10"})
 --
 -- @since 0.1.0.0
 type MaxLength :: Nat -> Type
@@ -44,6 +51,39 @@ instance KnownNat n => Predicate (MaxLength n) Text where
     where
       len = fromIntegral $ natVal' @n
       err = show txt <> " does not satisfy length <= " <> show len
+
+-- | Predicate for minimum length.
+--
+-- >>> validate @(MinLength 5) Proxy [1..10]
+-- Nothing
+--
+-- >>> validate @(MinLength 5) Proxy [1..4]
+-- Just (MkRefineException {predRep = MinLength 5, targetRep = [Integer], msg = "[1,2,3,4] does not satisfy length >= 5"})
+--
+-- @since 0.1.0.0
+type MinLength :: Nat -> Type
+data MinLength n
+
+-- | @since 0.1.0.0
+instance
+  forall n f a.
+  (Foldable f, KnownNat n, Typeable f, Show (f a), Typeable a) =>
+  Predicate (MinLength n) (f a)
+  where
+  validate _ xs
+    | length xs >= len = Nothing
+    | otherwise = Just $ PC.mkRefineException @(MinLength n) @(f a) err
+    where
+      len = fromIntegral $ natVal' @n
+      err = show xs <> " does not satisfy length >= " <> show len
+
+instance KnownNat n => Predicate (MinLength n) Text where
+  validate _ txt
+    | T.length txt >= len = Nothing
+    | otherwise = Just $ PC.mkRefineException @(MinLength n) @Text err
+    where
+      len = fromIntegral $ natVal' @n
+      err = show txt <> " does not satisfy length >= " <> show len
 
 -- | Predicate for ascended sorted.
 --
