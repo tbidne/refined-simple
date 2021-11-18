@@ -5,6 +5,7 @@ module Refined.Predicate.Text
     AlphaNumeric,
     Lower,
     Upper,
+    Hex,
   )
 where
 
@@ -157,3 +158,31 @@ instance Predicate Upper String where
     | otherwise = Just $ PC.mkRefineException @Alpha @String err
     where
       err = show txt <> " is not uppercase"
+
+-- | Predicate for hexadecimal text only.
+--
+-- >>> validate @Hex Proxy "ad381f5c"
+-- Nothing
+--
+-- >>> validate @Hex Proxy "ad381f5cxe"
+-- Just (MkRefineException {predRep = Hex, targetRep = [Char], msg = "\"ad381f5cxe\" is not hex"})
+--
+-- @since 0.1.0.0
+type Hex :: Type
+data Hex
+
+-- | @since 0.1.0.0
+instance Predicate Hex Text where
+  validate _ txt
+    | T.all C.isHexDigit txt = Nothing
+    | otherwise = Just $ PC.mkRefineException @Hex @Text err
+    where
+      err = show txt <> " is not hex"
+
+-- | @since 0.1.0.0
+instance Predicate Hex String where
+  validate _ txt
+    | all C.isHexDigit txt = Nothing
+    | otherwise = Just $ PC.mkRefineException @Hex @String err
+    where
+      err = show txt <> " is not hex"
