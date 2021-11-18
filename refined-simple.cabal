@@ -70,6 +70,9 @@ library
     Refined
     Refined.Internal
     Refined.Predicate
+    Refined.Predicate.Class
+    Refined.Predicate.Foldable
+    Refined.Predicate.Math
 
   build-depends:
     , base              >=4.14.0.0 && <4.17
