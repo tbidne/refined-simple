@@ -15,7 +15,7 @@ module Refined
 
     -- ** RefineException
     RefineException (..),
-    Predicate.mkRefineException,
+    P.mkRefineException,
 
     -- * Predicates
     Predicate (..),
@@ -31,25 +31,9 @@ module Refined
     PredNotFound,
 
     -- ** Built-In
-
-    -- *** Math
-    NotEquals,
-    NonZero,
-    GreaterThanEq,
-    NonNegative,
-    GreaterThan,
-    Positive,
-    LessThanEq,
-    NonPositive,
-    LessThan,
-    Negative,
-    Even,
-    Odd,
-
-    -- *** Foldable
-    MaxLength,
-    SortedAsc,
-    SortedDesc,
+    module Refined.Predicate.Math,
+    module Refined.Predicate.Foldable,
+    module Refined.Predicate.Text,
 
     -- * Misc Utils
     AppendP,
@@ -65,25 +49,11 @@ import GHC.TypeLits (ErrorMessage (..), TypeError)
 import Language.Haskell.TH.Syntax (Lift, Q, TExp)
 import Language.Haskell.TH.Syntax qualified as TH
 import Refined.Internal (RefineException (..), Refined (..))
-import Refined.Predicate
-  ( Even,
-    GreaterThan,
-    GreaterThanEq,
-    LessThan,
-    LessThanEq,
-    MaxLength,
-    Negative,
-    NonNegative,
-    NonPositive,
-    NonZero,
-    NotEquals,
-    Odd,
-    Positive,
-    Predicate (..),
-    SortedAsc,
-    SortedDesc,
-  )
-import Refined.Predicate qualified as Predicate
+import Refined.Predicate (Predicate (..))
+import Refined.Predicate qualified as P
+import Refined.Predicate.Foldable
+import Refined.Predicate.Math
+import Refined.Predicate.Text
 
 -- $setup
 -- >>> safeDiv :: (Implies ps NonZero, Integral n) => n -> Refined ps n -> n; safeDiv x d = x `div` unrefine d

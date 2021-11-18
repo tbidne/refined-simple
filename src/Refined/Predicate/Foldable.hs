@@ -10,6 +10,8 @@ where
 
 import Data.Foldable qualified as F
 import Data.Kind (Type)
+import Data.Text (Text)
+import Data.Text qualified as T
 import Data.Typeable (Proxy (..), Typeable)
 import GHC.TypeNats (KnownNat, Nat)
 import GHC.TypeNats qualified as TN
@@ -34,6 +36,14 @@ instance
     where
       len = fromIntegral $ natVal' @n
       err = show xs <> " does not satisfy length <= " <> show len
+
+instance KnownNat n => Predicate (MaxLength n) Text where
+  validate _ txt
+    | T.length txt <= len = Nothing
+    | otherwise = Just $ PC.mkRefineException @(MaxLength n) @Text err
+    where
+      len = fromIntegral $ natVal' @n
+      err = show txt <> " does not satisfy length <= " <> show len
 
 -- | Predicate for ascended sorted.
 --

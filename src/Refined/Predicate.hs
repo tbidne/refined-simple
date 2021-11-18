@@ -1,6 +1,3 @@
-{-# LANGUAGE AllowAmbiguousTypes #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-}
-
 -- | This module provides the 'Predicate' typeclass along with some built-in
 -- predicates.
 module Refined.Predicate
@@ -8,41 +5,15 @@ module Refined.Predicate
     Predicate (..),
     PC.mkRefineException,
 
-    -- * Math
-    NotEquals,
-    NonZero,
-    GreaterThanEq,
-    NonNegative,
-    GreaterThan,
-    Positive,
-    LessThanEq,
-    NonPositive,
-    LessThan,
-    Negative,
-    Even,
-    Odd,
-
-    -- * Foldable
-    MaxLength,
-    SortedAsc,
-    SortedDesc,
+    -- * Built-in Predicates
+    module Refined.Predicate.Math,
+    module Refined.Predicate.Foldable,
+    module Refined.Predicate.Text,
   )
 where
 
 import Refined.Predicate.Class (Predicate (..))
 import Refined.Predicate.Class qualified as PC
-import Refined.Predicate.Foldable (MaxLength, SortedAsc, SortedDesc)
+import Refined.Predicate.Foldable
 import Refined.Predicate.Math
-  ( Even,
-    GreaterThan,
-    GreaterThanEq,
-    LessThan,
-    LessThanEq,
-    Negative,
-    NonNegative,
-    NonPositive,
-    NonZero,
-    NotEquals,
-    Odd,
-    Positive,
-  )
+import Refined.Predicate.Text
