@@ -71,6 +71,7 @@ import Refined.Predicate.Text
 
 -- | Wraps @a@ in 'Refined' with no attached predicates.
 --
+-- ==== __Examples__
 -- >>> refineEmpty 0
 -- UnsafeRefined {unrefine = 0}
 --
@@ -81,6 +82,7 @@ refineEmpty = UnsafeRefined
 -- | Attempts to prove the given predicate. If it succeeds, we return the
 -- refined @a@. Otherwise we return an error.
 --
+-- ==== __Examples__
 -- >>> let x = refine @Positive @Int 5
 -- >>> :type x
 -- x :: Either RefineException (Refined '[Positive] Int)
@@ -100,6 +102,7 @@ refine x = case validate @p Proxy x of
 -- | Attempts to prove two predicates. If it succeeds, we return the
 -- refined @a@. Otherwise we return an error.
 --
+-- ==== __Examples__
 -- >>> let x = refine2 @Positive @Odd @Int 5
 -- >>> :type x
 -- x :: Either RefineException (Refined '[GreaterThan 0, Odd] Int)
@@ -120,6 +123,18 @@ refine2 = refine @p >=> addPred @q
 
 -- | Attempts to prove three predicates. If it succeeds, we return the
 -- refined @a@. Otherwise we return an error.
+--
+-- ==== __Examples__
+-- >>> let x = refine3 @Positive @Odd @(GreaterThan 2) @Int 5
+-- >>> :type x
+-- x :: Either
+--        RefineException (Refined '[GreaterThan 0, Odd, GreaterThan 2] Int)
+--
+-- >>> x
+-- Right (UnsafeRefined {unrefine = 5})
+--
+-- >>> refine3 @Positive @Odd @(GreaterThan 6) @Int 5
+-- Left (MkRefineException {predRep = GreaterThan 6, targetRep = Int, msg = "5 does not satisfy > 6"})
 --
 -- @since 0.1.0.0
 refine3 ::
@@ -146,7 +161,7 @@ refine4 = refine3 @p @q @r >=> addPred @s
 
 -- | Attempts to prove five predicates. If it succeeds, we return the
 -- refined @a@. Otherwise we return an error.
-
+--
 -- @since 0.1.0.0
 refine5 ::
   forall p q r s t a.
@@ -157,10 +172,17 @@ refine5 ::
     Predicate t a
   ) =>
   a ->
-  Either RefineException (Refined (AppendP t (AppendP s (AppendP r (AppendP q '[p])))) a)
+  Either
+    RefineException
+    (Refined (AppendP t (AppendP s (AppendP r (AppendP q '[p])))) a)
 refine5 = refine4 @p @q @r @s >=> addPred @t
 
 -- | Proves @p@ at compile-time via @TemplateHaskell@.
+--
+-- ==== __Examples__
+-- @
+--  $$(('refineTH' \@'NonZero' 5)) :: 'Refined' \'['NonZero'] 'Int'
+-- @
 --
 -- @since 0.1.0.0
 refineTH :: forall p a. (Predicate p a, Lift a) => a -> Q (TExp (Refined '[p] a))
@@ -169,6 +191,11 @@ refineTH x = case validate @p Proxy x of
   Just err -> error $ "Error validating Predicate in refineTH: " <> show err
 
 -- | Proves @p@ and @q@ at compile-time via @TemplateHaskell@.
+--
+-- ==== __Examples__
+-- @
+--  $$(('refineTH2' \@'NonZero' \@'Odd' 5)) :: 'Refined' '['NonZero', 'Odd'] 'Int'
+-- @
 --
 -- @since 0.1.0.0
 refineTH2 ::
@@ -181,6 +208,11 @@ refineTH2 x = case validate @p Proxy x *> validate @q Proxy x of
   Just err -> error $ "Error validating Predicate in refineTH2: " <> show err
 
 -- | Proves @p@ @q@, and @r@ at compile-time via @TemplateHaskell@.
+--
+-- ==== __Examples__
+-- @
+--  $$(('refineTH3' \@'NonZero' \@'Odd' @('GreaterThan' 4) 5)) :: 'Refined' '['NonZero', 'Odd', 'GreaterThan' 4] 'Int'
+-- @
 --
 -- @since 0.1.0.0
 refineTH3 ::
@@ -251,6 +283,7 @@ unsafeRefine x = case validate @p Proxy x of
 -- | Attempts to prove the given predicate. If it succeeds, we add the
 -- predicate to the list.
 --
+-- ==== __Examples__
 -- >>> let x = unsafeRefine @NonNegative @Int 7
 -- >>>     y = addPred @NonZero x
 -- >>> :type y
@@ -273,6 +306,7 @@ addPred (MkRefined x) = case validate @p Proxy x of
 -- | Attempts to prove the given predicate. If it succeeds, we add the
 -- predicate to the list.
 --
+-- ==== __Examples__
 -- >>> let x = unsafeRefine @NonNegative @Int 7
 -- >>>     y = unsafeAddPred @NonZero x
 -- >>> :type y
@@ -300,6 +334,7 @@ relax (MkRefined x) = UnsafeRefined x
 
 -- | Removes all predicates.
 --
+-- ==== __Examples__
 -- >>> let x = unsafeRefine @Even @Int 8
 -- >>>     y = unsafeAddPred @Positive x
 -- >>> :type y

@@ -83,6 +83,7 @@ This approach is simple and works well when we have just a few invariants we wan
 Refined types are similar, though instead of a newtype for each invariant, we attach a phantom type representing a predicate:
 
 ```haskell
+-- ps is a type-level list of predicates
 type Refined :: [Type] -> Type -> Type
 newtype Refined ps a = UnsafeRefined { unrefine :: a }
 ```

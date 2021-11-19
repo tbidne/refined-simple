@@ -24,11 +24,12 @@ import Refined.Predicate.Class qualified as PC
 
 -- | Predicate for maximum length.
 --
--- >>> validate @(MaxLength 10) Proxy [1..10]
+-- ==== __Examples__
+-- >>> validate @(MaxLength 4) Proxy [1..4]
 -- Nothing
 --
--- >>> validate @(MaxLength 10) Proxy [1..11]
--- Just (MkRefineException {predRep = MaxLength 10, targetRep = [Integer], msg = "[1,2,3,4,5,6,7,8,9,10,11] does not satisfy length <= 10"})
+-- >>> validate @(MaxLength 4) Proxy [1..5]
+-- Just (MkRefineException {predRep = MaxLength 4, targetRep = [Integer], msg = "[1,2,3,4,5] does not satisfy length <= 4"})
 --
 -- @since 0.1.0.0
 type MaxLength :: Nat -> Type
@@ -57,6 +58,7 @@ instance KnownNat n => Predicate (MaxLength n) Text where
 
 -- | Predicate for minimum length.
 --
+-- ==== __Examples__
 -- >>> validate @(MinLength 5) Proxy [1..10]
 -- Nothing
 --
@@ -90,6 +92,7 @@ instance KnownNat n => Predicate (MinLength n) Text where
 
 -- | Predicate for exact length.
 --
+-- ==== __Examples__
 -- >>> validate @(ExactLength 5) Proxy [1..5]
 -- Nothing
 --
@@ -113,8 +116,18 @@ instance
       len = fromIntegral $ natVal' @n
       err = show xs <> " does not satisfy length == " <> show len
 
+-- | @since 0.1.0.0
+instance forall n. (KnownNat n) => Predicate (ExactLength n) Text where
+  validate _ txt
+    | T.length txt == len = Nothing
+    | otherwise = Just $ PC.mkRefineException @(ExactLength n) @Text err
+    where
+      len = fromIntegral $ natVal' @n
+      err = show txt <> " does not satisfy length == " <> show len
+
 -- | Predicate for increasing.
 --
+-- ==== __Examples__
 -- >>> validate @Increasing Proxy [1,1,3,4,5]
 -- Nothing
 --
@@ -137,8 +150,18 @@ instance
     where
       err = show xs <> " is not increasing."
 
+-- | @since 0.1.0.0
+instance Predicate Increasing Text where
+  validate _ txt
+    | inOrder (>=) str = Nothing
+    | otherwise = Just $ PC.mkRefineException @Increasing @Text err
+    where
+      str = T.unpack txt
+      err = show str <> " is not increasing."
+
 -- | Predicate for strictly increasing.
 --
+-- ==== __Examples__
 -- >>> validate @StrictlyIncreasing Proxy [1,3,4,10]
 -- Nothing
 --
@@ -161,8 +184,18 @@ instance
     where
       err = show xs <> " is not strictly increasing."
 
+-- | @since 0.1.0.0
+instance Predicate StrictlyIncreasing Text where
+  validate _ txt
+    | inOrder (>) str = Nothing
+    | otherwise = Just $ PC.mkRefineException @StrictlyIncreasing @Text err
+    where
+      str = T.unpack txt
+      err = show str <> " is not strictly increasing."
+
 -- | Predicate for decreasing.
 --
+-- ==== __Examples__
 -- >>> validate @Decreasing Proxy [5,4,4,3,1]
 -- Nothing
 --
@@ -185,8 +218,18 @@ instance
     where
       err = show xs <> " is not decreasing."
 
--- | Predicate for decreasing.
+-- | @since 0.1.0.0
+instance Predicate Decreasing Text where
+  validate _ txt
+    | inOrder (<=) str = Nothing
+    | otherwise = Just $ PC.mkRefineException @Decreasing @Text err
+    where
+      str = T.unpack txt
+      err = show str <> " is not decreasing."
+
+-- | Predicate for strictly decreasing.
 --
+-- ==== __Examples__
 -- >>> validate @StrictlyDecreasing Proxy [6,4,3,1]
 -- Nothing
 --
@@ -208,6 +251,15 @@ instance
     | otherwise = Just $ PC.mkRefineException @StrictlyDecreasing @(f a) err
     where
       err = show xs <> " is not strictly decreasing."
+
+-- | @since 0.1.0.0
+instance Predicate StrictlyDecreasing Text where
+  validate _ txt
+    | inOrder (<) str = Nothing
+    | otherwise = Just $ PC.mkRefineException @StrictlyDecreasing @Text err
+    where
+      str = T.unpack txt
+      err = show str <> " is not strictly decreasing."
 
 data InOrder a
   = Nil

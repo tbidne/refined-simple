@@ -26,6 +26,7 @@ import Refined.Predicate.Class qualified as PC
 
 -- | Predicate for @x = 'NotEquals' n@ implies \(x \ne n \).
 --
+-- ==== __Examples__
 -- >>> validate @(NotEquals 5) Proxy 10
 -- Nothing
 --
@@ -54,6 +55,7 @@ instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate
 
 -- | Predicate for @x = 'GreaterThanEq' n@ implies \(x \geq n \).
 --
+-- ==== __Examples__
 -- >>> validate @(GreaterThanEq 5) Proxy 5
 -- Nothing
 --
@@ -80,6 +82,7 @@ instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate
 
 -- | Predicate for @x = 'GreaterThan' n@ implies \(x > n \).
 --
+-- ==== __Examples__
 -- >>> validate @(GreaterThan 5) Proxy 6
 -- Nothing
 --
@@ -106,6 +109,7 @@ type Positive = GreaterThan 0
 
 -- | Predicate for @x = 'LessThanEq' n@ implies \(x \leq n \).
 --
+-- ==== __Examples__
 -- >>> validate @(LessThanEq 5) Proxy 5
 -- Nothing
 --
@@ -131,6 +135,7 @@ instance
 
 -- | Predicate for @x = 'LessThan' n@ implies \(x < n \).
 --
+-- ==== __Examples__
 -- >>> validate @(LessThan 5) Proxy 4
 -- Nothing
 --
@@ -156,6 +161,7 @@ instance
 
 -- | Predicate for non-positive types, i.e. \(n \leq 0\).
 --
+-- ==== __Examples__
 -- >>> validate @NonPositive Proxy 0
 -- Nothing
 --
@@ -179,6 +185,7 @@ instance
 
 -- | Predicate for non-positive types, i.e. \(n < 0\).
 --
+-- ==== __Examples__
 -- >>> validate @Negative Proxy (-2)
 -- Nothing
 --
@@ -202,6 +209,7 @@ instance
 
 -- | Predicate for even integral types.
 --
+-- ==== __Examples__
 -- >>> validate @Even Proxy 4
 -- Nothing
 --
@@ -222,6 +230,7 @@ instance forall a. (Integral a, Show a, Typeable a) => Predicate Even a where
 
 -- | Predicate for odd integral types.
 --
+-- ==== __Examples__
 -- >>> validate @Odd Proxy 5
 -- Nothing
 --
