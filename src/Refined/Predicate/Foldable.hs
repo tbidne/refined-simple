@@ -4,8 +4,11 @@
 module Refined.Predicate.Foldable
   ( MaxLength,
     MinLength,
-    SortedAsc,
-    SortedDesc,
+    ExactLength,
+    Increasing,
+    StrictlyIncreasing,
+    Decreasing,
+    StrictlyDecreasing,
   )
 where
 
@@ -85,91 +88,144 @@ instance KnownNat n => Predicate (MinLength n) Text where
       len = fromIntegral $ natVal' @n
       err = show txt <> " does not satisfy length >= " <> show len
 
--- | Predicate for ascended sorted.
+-- | Predicate for exact length.
 --
--- >>> validate @SortedAsc Proxy [1,1,3,4,5]
+-- >>> validate @(ExactLength 5) Proxy [1..5]
 -- Nothing
 --
--- >>> validate @SortedAsc Proxy [1,2,5,3]
--- Just (MkRefineException {predRep = SortedAsc, targetRep = [Integer], msg = "[1,2,5,3] is not in ascending order."})
+-- >>> validate @(ExactLength 5) Proxy [1..4]
+-- Just (MkRefineException {predRep = ExactLength 5, targetRep = [Integer], msg = "[1,2,3,4] does not satisfy length == 5"})
 --
 -- @since 0.1.0.0
+type ExactLength :: Nat -> Type
+data ExactLength n
+
+-- | @since 0.1.0.0
+instance
+  forall n f a.
+  (Foldable f, KnownNat n, Typeable f, Show (f a), Typeable a) =>
+  Predicate (ExactLength n) (f a)
+  where
+  validate _ xs
+    | length xs == len = Nothing
+    | otherwise = Just $ PC.mkRefineException @(ExactLength n) @(f a) err
+    where
+      len = fromIntegral $ natVal' @n
+      err = show xs <> " does not satisfy length == " <> show len
+
+-- | Predicate for increasing.
+--
+-- >>> validate @Increasing Proxy [1,1,3,4,5]
+-- Nothing
+--
+-- >>> validate @Increasing Proxy [1,2,5,3]
+-- Just (MkRefineException {predRep = Increasing, targetRep = [Integer], msg = "[1,2,5,3] is not increasing."})
 --
 -- @since 0.1.0.0
-type SortedAsc :: Type
-data SortedAsc
+type Increasing :: Type
+data Increasing
 
 -- | @since 0.1.0.0
 instance
   forall f a.
   (Foldable f, Ord a, Show (f a), Typeable f, Typeable a) =>
-  Predicate SortedAsc (f a)
+  Predicate Increasing (f a)
   where
   validate _ xs
-    | isSortedAsc xs = Nothing
-    | otherwise = Just $ PC.mkRefineException @SortedAsc @(f a) err
+    | inOrder (>=) xs = Nothing
+    | otherwise = Just $ PC.mkRefineException @Increasing @(f a) err
     where
-      err = show xs <> " is not in ascending order."
+      err = show xs <> " is not increasing."
 
-data IsSortedAsc a
-  = NilAsc
-  | SortedAsc a
-  | FailAsc
-  deriving (Eq, Show)
-
-isSortedAsc :: forall f a. (Foldable f, Ord a) => f a -> Bool
-isSortedAsc xs = case F.foldl' f NilAsc xs of
-  FailAsc -> False
-  _ -> True
-  where
-    f NilAsc x = SortedAsc x
-    f FailAsc _ = FailAsc
-    f (SortedAsc y) x =
-      if x >= y
-        then SortedAsc x
-        else FailAsc
-
--- | Predicate for descended sorted.
+-- | Predicate for strictly increasing.
 --
--- >>> validate @SortedDesc Proxy [5,4,4,3,1]
+-- >>> validate @StrictlyIncreasing Proxy [1,3,4,10]
 -- Nothing
 --
--- >>> validate @SortedDesc Proxy [5,4,4,6,1]
--- Just (MkRefineException {predRep = SortedAsc, targetRep = [Integer], msg = "[5,4,4,6,1] is not in descending order."})
+-- >>> validate @StrictlyIncreasing Proxy [1,1,2,5]
+-- Just (MkRefineException {predRep = StrictlyIncreasing, targetRep = [Integer], msg = "[1,1,2,5] is not strictly increasing."})
 --
 -- @since 0.1.0.0
-type SortedDesc :: Type
-data SortedDesc
+type StrictlyIncreasing :: Type
+data StrictlyIncreasing
 
 -- | @since 0.1.0.0
 instance
   forall f a.
   (Foldable f, Ord a, Show (f a), Typeable f, Typeable a) =>
-  Predicate SortedDesc (f a)
+  Predicate StrictlyIncreasing (f a)
   where
   validate _ xs
-    | isSortedDesc xs = Nothing
-    | otherwise = Just $ PC.mkRefineException @SortedAsc @(f a) err
+    | inOrder (>) xs = Nothing
+    | otherwise = Just $ PC.mkRefineException @StrictlyIncreasing @(f a) err
     where
-      err = show xs <> " is not in descending order."
+      err = show xs <> " is not strictly increasing."
 
-data IsSortedDesc a
-  = NilDesc
-  | SortedDesc a
-  | FailDesc
+-- | Predicate for decreasing.
+--
+-- >>> validate @Decreasing Proxy [5,4,4,3,1]
+-- Nothing
+--
+-- >>> validate @Decreasing Proxy [5,4,4,6,1]
+-- Just (MkRefineException {predRep = Decreasing, targetRep = [Integer], msg = "[5,4,4,6,1] is not decreasing."})
+--
+-- @since 0.1.0.0
+type Decreasing :: Type
+data Decreasing
+
+-- | @since 0.1.0.0
+instance
+  forall f a.
+  (Foldable f, Ord a, Show (f a), Typeable f, Typeable a) =>
+  Predicate Decreasing (f a)
+  where
+  validate _ xs
+    | inOrder (<=) xs = Nothing
+    | otherwise = Just $ PC.mkRefineException @Decreasing @(f a) err
+    where
+      err = show xs <> " is not decreasing."
+
+-- | Predicate for decreasing.
+--
+-- >>> validate @StrictlyDecreasing Proxy [6,4,3,1]
+-- Nothing
+--
+-- >>> validate @StrictlyDecreasing Proxy [5,4,4,2,1]
+-- Just (MkRefineException {predRep = StrictlyDecreasing, targetRep = [Integer], msg = "[5,4,4,2,1] is not strictly decreasing."})
+--
+-- @since 0.1.0.0
+type StrictlyDecreasing :: Type
+data StrictlyDecreasing
+
+-- | @since 0.1.0.0
+instance
+  forall f a.
+  (Foldable f, Ord a, Show (f a), Typeable f, Typeable a) =>
+  Predicate StrictlyDecreasing (f a)
+  where
+  validate _ xs
+    | inOrder (<) xs = Nothing
+    | otherwise = Just $ PC.mkRefineException @StrictlyDecreasing @(f a) err
+    where
+      err = show xs <> " is not strictly decreasing."
+
+data InOrder a
+  = Nil
+  | Ordered a
+  | Fail
   deriving (Eq, Show)
 
-isSortedDesc :: forall f a. (Foldable f, Ord a) => f a -> Bool
-isSortedDesc xs = case F.foldl' f NilDesc xs of
-  FailDesc -> False
+inOrder :: forall f a. Foldable f => (a -> a -> Bool) -> f a -> Bool
+inOrder compFn xs = case F.foldl' f Nil xs of
+  Fail -> False
   _ -> True
   where
-    f NilDesc x = SortedDesc x
-    f FailDesc _ = FailDesc
-    f (SortedDesc y) x =
-      if x <= y
-        then SortedDesc x
-        else FailDesc
+    f Nil x = Ordered x
+    f Fail _ = Fail
+    f (Ordered y) x =
+      if x `compFn` y
+        then Ordered x
+        else Fail
 
 natVal' :: forall n. KnownNat n => Integer
 natVal' = toInteger $ TN.natVal (Proxy @n)

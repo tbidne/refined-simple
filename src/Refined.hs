@@ -10,7 +10,15 @@ module Refined
     Refined (MkRefined, unrefine),
     refineEmpty,
     refine,
+    refine2,
+    refine3,
+    refine4,
+    refine5,
     refineTH,
+    refineTH2,
+    refineTH3,
+    refineTH4,
+    refineTH5,
     unsafeRefine,
 
     -- ** RefineException
@@ -43,6 +51,7 @@ module Refined
   )
 where
 
+import Control.Monad ((>=>))
 import Data.Kind (Constraint, Type)
 import Data.Proxy (Proxy (..))
 import GHC.TypeLits (ErrorMessage (..), TypeError)
@@ -57,6 +66,8 @@ import Refined.Predicate.Text
 
 -- $setup
 -- >>> safeDiv :: (Implies ps NonZero, Integral n) => n -> Refined ps n -> n; safeDiv x d = x `div` unrefine d
+-- >>> import Data.Text (Text)
+-- >>> :set -XOverloadedStrings
 
 -- | Wraps @a@ in 'Refined' with no attached predicates.
 --
@@ -86,15 +97,146 @@ refine x = case validate @p Proxy x of
   Nothing -> Right $ UnsafeRefined x
   Just ex -> Left ex
 
--- | addPreds @p@ at compile-time via @TemplateHaskell@.
+-- | Attempts to prove two predicates. If it succeeds, we return the
+-- refined @a@. Otherwise we return an error.
+--
+-- >>> let x = refine2 @Positive @Odd @Int 5
+-- >>> :type x
+-- x :: Either RefineException (Refined '[GreaterThan 0, Odd] Int)
+--
+-- >>> x
+-- Right (UnsafeRefined {unrefine = 5})
+--
+-- >>> refine2 @Positive @Even @Int 5
+-- Left (MkRefineException {predRep = Even, targetRep = Int, msg = "5 is not even"})
+--
+-- @since 0.1.0.0
+refine2 ::
+  forall p q a.
+  (Predicate p a, Predicate q a) =>
+  a ->
+  Either RefineException (Refined (AppendP q '[p]) a)
+refine2 = refine @p >=> addPred @q
+
+-- | Attempts to prove three predicates. If it succeeds, we return the
+-- refined @a@. Otherwise we return an error.
+--
+-- @since 0.1.0.0
+refine3 ::
+  forall p q r a.
+  (Predicate p a, Predicate q a, Predicate r a) =>
+  a ->
+  Either RefineException (Refined (AppendP r (AppendP q '[p])) a)
+refine3 = refine2 @p @q >=> addPred @r
+
+-- | Attempts to prove four predicates. If it succeeds, we return the
+-- refined @a@. Otherwise we return an error.
+--
+-- @since 0.1.0.0
+refine4 ::
+  forall p q r s a.
+  ( Predicate p a,
+    Predicate q a,
+    Predicate r a,
+    Predicate s a
+  ) =>
+  a ->
+  Either RefineException (Refined (AppendP s (AppendP r (AppendP q '[p]))) a)
+refine4 = refine3 @p @q @r >=> addPred @s
+
+-- | Attempts to prove five predicates. If it succeeds, we return the
+-- refined @a@. Otherwise we return an error.
+
+-- @since 0.1.0.0
+refine5 ::
+  forall p q r s t a.
+  ( Predicate p a,
+    Predicate q a,
+    Predicate r a,
+    Predicate s a,
+    Predicate t a
+  ) =>
+  a ->
+  Either RefineException (Refined (AppendP t (AppendP s (AppendP r (AppendP q '[p])))) a)
+refine5 = refine4 @p @q @r @s >=> addPred @t
+
+-- | Proves @p@ at compile-time via @TemplateHaskell@.
 --
 -- @since 0.1.0.0
 refineTH :: forall p a. (Predicate p a, Lift a) => a -> Q (TExp (Refined '[p] a))
 refineTH x = case validate @p Proxy x of
   Nothing -> TH.TExp <$> TH.lift (UnsafeRefined x)
-  Just err -> error $ "Error validating Predicate in mkRefinedTH: " <> show err
+  Just err -> error $ "Error validating Predicate in refineTH: " <> show err
 
--- | Attempts to addPred the given predicate. If it succeeds, we return the
+-- | Proves @p@ and @q@ at compile-time via @TemplateHaskell@.
+--
+-- @since 0.1.0.0
+refineTH2 ::
+  forall p q a.
+  (Predicate p a, Predicate q a, Lift a) =>
+  a ->
+  Q (TExp (Refined (AppendP q '[p]) a))
+refineTH2 x = case validate @p Proxy x *> validate @q Proxy x of
+  Nothing -> TH.TExp <$> TH.lift (UnsafeRefined x)
+  Just err -> error $ "Error validating Predicate in refineTH2: " <> show err
+
+-- | Proves @p@ @q@, and @r@ at compile-time via @TemplateHaskell@.
+--
+-- @since 0.1.0.0
+refineTH3 ::
+  forall p q r a.
+  (Predicate p a, Predicate q a, Predicate r a, Lift a) =>
+  a ->
+  Q (TExp (Refined (AppendP r (AppendP q '[p])) a))
+refineTH3 x = case validate @p Proxy x
+  *> validate @q Proxy x
+  *> validate @r Proxy x of
+  Nothing -> TH.TExp <$> TH.lift (UnsafeRefined x)
+  Just err -> error $ "Error validating Predicate in refineTH3: " <> show err
+
+-- | Proves @p@, @q@, @r@, and @s@ at compile-time via @TemplateHaskell@.
+--
+-- @since 0.1.0.0
+refineTH4 ::
+  forall p q r s a.
+  ( Predicate p a,
+    Predicate q a,
+    Predicate r a,
+    Predicate s a,
+    Lift a
+  ) =>
+  a ->
+  Q (TExp (Refined (AppendP s (AppendP r (AppendP q '[p]))) a))
+refineTH4 x = case validate @p Proxy x
+  *> validate @q Proxy x
+  *> validate @r Proxy x
+  *> validate @s Proxy x of
+  Nothing -> TH.TExp <$> TH.lift (UnsafeRefined x)
+  Just err -> error $ "Error validating Predicate in refineTH4: " <> show err
+
+-- | Proves @p@, @q@, @r@, @s@, and @t@ at compile-time via @TemplateHaskell@.
+--
+-- @since 0.1.0.0
+refineTH5 ::
+  forall p q r s t a.
+  ( Predicate p a,
+    Predicate q a,
+    Predicate r a,
+    Predicate s a,
+    Predicate t a,
+    Lift a
+  ) =>
+  a ->
+  Q (TExp (Refined (AppendP t (AppendP s (AppendP r (AppendP q '[p])))) a))
+refineTH5 x = case validate @p Proxy x
+  *> validate @q Proxy x
+  *> validate @r Proxy x
+  *> validate @s Proxy x
+  *> validate @t Proxy x of
+  Nothing -> TH.TExp <$> TH.lift (UnsafeRefined x)
+  Just err -> error $ "Error validating Predicate in refineTH5: " <> show err
+
+-- | Attempts to prove the given predicate. If it succeeds, we return the
 -- refined @a@. Otherwise we die with a runtime error.
 --
 -- >>> unsafeRefine @NonNegative 0
@@ -106,7 +248,7 @@ unsafeRefine x = case validate @p Proxy x of
   Nothing -> UnsafeRefined x
   Just err -> error $ "Error validating Predicate in unsafeRefined: " <> show err
 
--- | Attempts to addPred the given predicate. If it succeeds, we add the
+-- | Attempts to prove the given predicate. If it succeeds, we add the
 -- predicate to the list.
 --
 -- >>> let x = unsafeRefine @NonNegative @Int 7
@@ -128,7 +270,7 @@ addPred (MkRefined x) = case validate @p Proxy x of
   Nothing -> Right $ UnsafeRefined x
   Just ex -> Left ex
 
--- | Attempts to addPred the given predicate. If it succeeds, we add the
+-- | Attempts to prove the given predicate. If it succeeds, we add the
 -- predicate to the list.
 --
 -- >>> let x = unsafeRefine @NonNegative @Int 7
