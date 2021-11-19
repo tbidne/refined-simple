@@ -19,7 +19,7 @@ import Language.Haskell.TH.Syntax (Lift (..))
 --
 -- @since 0.1.0.0
 type Refined :: [Type] -> Type -> Type
-newtype Refined p a = UnsafeRefined
+newtype Refined ps a = UnsafeRefined
   { -- | @since 0.1.0.0
     unrefine :: a
   }

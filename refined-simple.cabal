@@ -15,7 +15,7 @@ synopsis:
 description:
   @refined-simple@ provides a simple implementation of refined types with
   a small dependency footprint. Its main inspirations are the wonderful
-  @refine@ and @facts@ packages.
+  @refined@ and @facts@ packages.
   .
   Differences from @refined@:
   .
@@ -24,7 +24,6 @@ description:
   * Predicate composition is a type-level list (like @facts@), not a
   combination of logical operators. This makes composition less general
   than @refined@'s, but it is easier to work with.
-  * @refined-simple@ provides fewer built-in predicates.
   .
   Differences from @facts@:
   .
@@ -38,7 +37,7 @@ description:
   mathematical foundation, try @facts@. Finally, if you would ordinarily
   use smart constructors but are tired of some of the shortcomings
   (e.g. high boilerplate, no safe creation for compile-time constants,
-  constants, no composition), then perhaps give @refined-simple@ a try.
+  no composition), then perhaps give @refined-simple@ a try.
 
 category:           Refined Types
 extra-source-files:
