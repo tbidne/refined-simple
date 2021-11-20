@@ -2,7 +2,8 @@
 
 -- | Provides predicates for 'Foldable'.
 module Refined.Predicate.Foldable
-  ( MaxLength,
+  ( NonEmpty,
+    MaxLength,
     MinLength,
     ExactLength,
     Increasing,
@@ -21,6 +22,41 @@ import GHC.TypeNats (KnownNat, Nat)
 import GHC.TypeNats qualified as TN
 import Refined.Predicate.Class (Predicate (..))
 import Refined.Predicate.Class qualified as PC
+
+-- $setup
+-- >>> :set -XOverloadedStrings
+
+-- | Predicate for non-empty.
+--
+-- ==== __Examples__
+-- >>> validate @NonEmpty Proxy [1]
+-- Nothing
+--
+-- >>> validate @NonEmpty @Text Proxy ""
+-- Just (MkRefineException {predRep = NonEmpty, targetRep = Text, msg = "\"\" is empty"})
+--
+-- @since 0.1.0.0
+type NonEmpty :: Type
+data NonEmpty
+
+-- | @since 0.1.0.0
+instance
+  forall f a.
+  (Foldable f, Typeable f, Show (f a), Typeable a) =>
+  Predicate NonEmpty (f a)
+  where
+  validate _ xs
+    | (not . null) xs = Nothing
+    | otherwise = Just $ PC.mkRefineException @NonEmpty @(f a) err
+    where
+      err = show xs <> " is empty"
+
+instance Predicate NonEmpty Text where
+  validate _ txt
+    | (not . T.null) txt = Nothing
+    | otherwise = Just $ PC.mkRefineException @NonEmpty @Text err
+    where
+      err = show txt <> " is empty"
 
 -- | Predicate for maximum length.
 --
