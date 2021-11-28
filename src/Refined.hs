@@ -28,6 +28,13 @@ module Refined
     -- * Predicates
     Predicate (..),
 
+    -- ** Operators
+    P.Not,
+    P.Or,
+    type (\/),
+    P.Xor,
+    type (<-/->),
+
     -- ** Proving
     addPred,
     unsafeAddPred,
@@ -47,6 +54,7 @@ module Refined
     AppendP,
     DeleteP,
     ImpliesBool,
+    ImpliesBoolExpr,
     ErrIfFalse,
   )
 where
@@ -54,11 +62,12 @@ where
 import Control.Monad ((>=>))
 import Data.Kind (Constraint, Type)
 import Data.Proxy (Proxy (..))
+import Data.Type.Bool qualified as B
 import GHC.TypeLits (ErrorMessage (..), TypeError)
 import Language.Haskell.TH.Syntax (Lift, Q, TExp)
 import Language.Haskell.TH.Syntax qualified as TH
 import Refined.Internal (RefineException (..), Refined (..))
-import Refined.Predicate (Predicate (..))
+import Refined.Predicate (Predicate (..), type (<-/->), type (\/))
 import Refined.Predicate qualified as P
 import Refined.Predicate.Foldable
 import Refined.Predicate.Math
@@ -323,6 +332,7 @@ unsafeAddPred (MkRefined x) = case satisfies @p Proxy x of
 
 -- | Removes all occurrences of the desired predicate, if it exists.
 --
+-- ==== __Examples__
 -- >>> let x = unsafeRefine @Even @Int 8
 -- >>>     x' = relax @Even x
 -- >>> :type x'
@@ -347,9 +357,10 @@ relax (MkRefined x) = UnsafeRefined x
 relaxAll :: Refined ps a -> Refined '[] a
 relaxAll (MkRefined x) = UnsafeRefined x
 
--- | @'Implies' ps p@ raises a type error if @p@ is not found
--- within @ps@.
+-- | @'Implies' ps p@ raises a type error if @ps@ does not logically imply
+-- @p@. See 'ImpliesBoolExpr' for more information on when @ps@ implies @p@.
 --
+-- ==== __Examples__
 -- >>> -- safeDiv :: (Implies ps NonZero, Integral n) => n -> Refined ps n -> n
 -- >>> let d = unsafeRefine @NonZero @Int 7
 -- >>> safeDiv 14 d
@@ -386,7 +397,47 @@ type ImpliesBool :: [Type] -> Type -> Bool
 type family ImpliesBool ps p where
   ImpliesBool '[] _ = 'False
   ImpliesBool (p : _) p = 'True
-  ImpliesBool (q : ps) p = ImpliesBool ps p
+  ImpliesBool (q : ps) p = ImpliesBoolExpr q p B.|| ImpliesBool ps p
+
+-- | @ImpliesBoolExpr expr p@ returns 'True if @expr@ logically implies @p@.
+-- @expr@ is assumed to be a combination of predicate literals (i.e. a
+-- predicate with no logical connectives) with logical combinators from
+-- 'Refined.Predicate.Operators'.
+--
+-- NB. For a (possibly exclusive) disjunction to imply @p@, /both/ clauses
+-- must individually imply @p@, since we cannot know which one is satisfied.
+-- That is,
+--
+-- \[
+--   q_1 \vee q_2 \implies p \quad \iff \quad (q_1 \implies p) \wedge (q_2 \implies p)
+-- \]
+--
+-- ==== __Examples__
+-- >>> :kind! ImpliesBoolExpr (P.Not NonZero) (NonNegative)
+-- ImpliesBoolExpr (P.Not NonZero) (NonNegative) :: Bool
+-- = 'False
+--
+-- >>> :kind! ImpliesBoolExpr (P.Not (P.Not NonNegative)) NonNegative
+-- ImpliesBoolExpr (P.Not (P.Not NonNegative)) NonNegative :: Bool
+-- = 'True
+--
+-- >>> :kind! ImpliesBoolExpr (NonZero \/ Alpha) NonZero
+-- ImpliesBoolExpr (NonZero \/ Alpha) NonZero :: Bool
+-- = 'False
+--
+-- >>> :kind! ImpliesBoolExpr (Alpha \/ (P.Not (P.Not Alpha))) Alpha
+-- ImpliesBoolExpr (Alpha \/ (P.Not (P.Not Alpha))) Alpha :: Bool
+-- = 'True
+--
+-- @since 0.1.0.0
+type ImpliesBoolExpr :: Type -> Type -> Bool
+type family ImpliesBoolExpr expr p where
+  ImpliesBoolExpr p p = 'True
+  ImpliesBoolExpr (P.Not p) p = 'False
+  ImpliesBoolExpr (P.Not expr) p = ImpliesBoolExpr expr (P.Not p)
+  ImpliesBoolExpr (e1 \/ e2) p = ImpliesBoolExpr e1 p B.&& ImpliesBoolExpr e2 p
+  ImpliesBoolExpr (e1 <-/-> e2) p = ImpliesBoolExpr e1 p B.&& ImpliesBoolExpr e2 p
+  ImpliesBoolExpr q p = 'False
 
 -- | Emits a 'TypeError' when given 'False'. The parameter type is used in the
 -- error message.

@@ -1,6 +1,8 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
 -- | Provides predicates for 'Foldable'.
+--
+-- @since 0.1.0.0
 module Refined.Predicate.Foldable
   ( NonEmpty,
     MaxLength,
@@ -51,6 +53,7 @@ instance
     where
       err = show xs <> " is empty"
 
+-- | @since 0.1.0.0
 instance Predicate NonEmpty Text where
   satisfies _ txt
     | (not . T.null) txt = Nothing
@@ -84,6 +87,7 @@ instance
       len = fromIntegral $ natVal' @n
       err = show xs <> " does not satisfy length <= " <> show len
 
+-- | @since 0.1.0.0
 instance KnownNat n => Predicate (MaxLength n) Text where
   satisfies _ txt
     | T.length txt <= len = Nothing
@@ -118,6 +122,7 @@ instance
       len = fromIntegral $ natVal' @n
       err = show xs <> " does not satisfy length >= " <> show len
 
+-- | @since 0.1.0.0
 instance KnownNat n => Predicate (MinLength n) Text where
   satisfies _ txt
     | T.length txt >= len = Nothing

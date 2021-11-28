@@ -1,6 +1,8 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
 -- | Provides predicates for numeric types.
+--
+-- @since 0.1.0.0
 module Refined.Predicate.Math
   ( NotEquals,
     NonZero,

@@ -1,6 +1,8 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
 -- | Provides the 'Predicate' typeclass.
+--
+-- @since 0.1.0.0
 module Refined.Predicate.Class
   ( Predicate (..),
     mkRefineException,

@@ -4,6 +4,8 @@
 
 -- | Internal module that exports types, including the unsafe
 -- 'UnsafeRefined'.
+--
+-- @since 0.1.0.0
 module Refined.Internal
   ( Refined (MkRefined, ..),
     RefineException (..),
@@ -14,8 +16,26 @@ import Data.Kind (Type)
 import Data.Typeable (TypeRep)
 import Language.Haskell.TH.Syntax (Lift (..))
 
--- | Newtype over @a@ that has a type-level list of attached predicates.
--- This is the core type for "Refined".
+-- | This is the core type for 'Refined', a newtype over @a@ that has a
+-- type-level list of attached predicates. The list should be thought of as
+-- a conjunction (AND) of clauses, where each clause is a disjunction (OR) of
+-- literals. In other words, the list is in in conjunctive normal form, with
+-- the caveat that we also allow exclusive disjunction (XOR).
+--
+-- For example,
+--
+-- @
+--   Refined '[NonZero, Positive, Xor Even Odd] Int
+--   Refined '[MaxLength 100, Not Upper, Or Alpha Numeric] Text
+-- @
+--
+-- are in CNF, while
+--
+-- @
+--   Refined '[Not (Or Alpha Numeric)] Text
+-- @
+--
+-- is not.
 --
 -- @since 0.1.0.0
 type Refined :: [Type] -> Type -> Type

@@ -1,4 +1,6 @@
 -- | Provides predicates for 'Text' and 'String'.
+--
+-- @since 0.1.0.0
 module Refined.Predicate.Text
   ( Alpha,
     Numeric,

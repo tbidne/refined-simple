@@ -72,6 +72,7 @@ library
     Refined.Predicate.Class
     Refined.Predicate.Foldable
     Refined.Predicate.Math
+    Refined.Predicate.Operators
     Refined.Predicate.Text
 
   build-depends:
