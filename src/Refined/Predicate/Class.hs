@@ -19,7 +19,7 @@ class (Typeable p, Typeable a) => Predicate p a where
   -- 'Just' 'RefineException' on a validation failure.
   --
   -- @since 0.1.0.0
-  validate :: Proxy p -> a -> Maybe RefineException
+  satisfies :: Proxy p -> a -> Maybe RefineException
 
 -- | @mkRefineException \@p \@a msg@ creates a 'RefineException' for type @a@,
 -- predicate @p@, and error message @msg@.

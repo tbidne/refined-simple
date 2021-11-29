@@ -27,10 +27,10 @@ import Refined.Predicate.Class qualified as PC
 -- | Predicate for @x = 'NotEquals' n@ implies \(x \ne n \).
 --
 -- ==== __Examples__
--- >>> validate @(NotEquals 5) Proxy 10
+-- >>> satisfies @(NotEquals 5) Proxy 10
 -- Nothing
 --
--- >>> validate @(NotEquals 5) Proxy 5
+-- >>> satisfies @(NotEquals 5) Proxy 5
 -- Just (MkRefineException {predRep = NotEquals 5, targetRep = Integer, msg = "5 does not satisfy /= 5"})
 --
 -- @since 0.1.0.0
@@ -46,7 +46,7 @@ type NonZero = NotEquals 0
 
 -- | @since 0.1.0.0
 instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate (NotEquals n) a where
-  validate _ x
+  satisfies _ x
     | x /= n' = Nothing
     | otherwise = Just $ PC.mkRefineException @(NotEquals n) @a err
     where
@@ -56,10 +56,10 @@ instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate
 -- | Predicate for @x = 'GreaterThanEq' n@ implies \(x \geq n \).
 --
 -- ==== __Examples__
--- >>> validate @(GreaterThanEq 5) Proxy 5
+-- >>> satisfies @(GreaterThanEq 5) Proxy 5
 -- Nothing
 --
--- >>> validate @(GreaterThanEq 5) Proxy 4
+-- >>> satisfies @(GreaterThanEq 5) Proxy 4
 -- Just (MkRefineException {predRep = GreaterThanEq 5, targetRep = Integer, msg = "4 does not satisfy >= 5"})
 --
 -- @since 0.1.0.0
@@ -73,7 +73,7 @@ type NonNegative = GreaterThanEq 0
 
 -- | @since 0.1.0.0
 instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate (GreaterThanEq n) a where
-  validate _ x
+  satisfies _ x
     | x >= n' = Nothing
     | otherwise = Just $ PC.mkRefineException @(GreaterThanEq n) @a err
     where
@@ -83,10 +83,10 @@ instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate
 -- | Predicate for @x = 'GreaterThan' n@ implies \(x > n \).
 --
 -- ==== __Examples__
--- >>> validate @(GreaterThan 5) Proxy 6
+-- >>> satisfies @(GreaterThan 5) Proxy 6
 -- Nothing
 --
--- >>> validate @(GreaterThan 5) Proxy 5
+-- >>> satisfies @(GreaterThan 5) Proxy 5
 -- Just (MkRefineException {predRep = GreaterThan 5, targetRep = Integer, msg = "5 does not satisfy > 5"})
 --
 -- @since 0.1.0.0
@@ -95,7 +95,7 @@ data GreaterThan n
 
 -- | @since 0.1.0.0
 instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate (GreaterThan n) a where
-  validate _ x
+  satisfies _ x
     | x > n' = Nothing
     | otherwise = Just $ PC.mkRefineException @(GreaterThan n) @a err
     where
@@ -110,10 +110,10 @@ type Positive = GreaterThan 0
 -- | Predicate for @x = 'LessThanEq' n@ implies \(x \leq n \).
 --
 -- ==== __Examples__
--- >>> validate @(LessThanEq 5) Proxy 5
+-- >>> satisfies @(LessThanEq 5) Proxy 5
 -- Nothing
 --
--- >>> validate @(LessThanEq 5) Proxy 6
+-- >>> satisfies @(LessThanEq 5) Proxy 6
 -- Just (MkRefineException {predRep = LessThanEq 5, targetRep = Integer, msg = "6 does not satisfy <= 5"})
 --
 -- @since 0.1.0.0
@@ -126,7 +126,7 @@ instance
   (KnownNat n, Num a, Ord a, Show a, Typeable a) =>
   Predicate (LessThanEq n) a
   where
-  validate _ x
+  satisfies _ x
     | x <= n' = Nothing
     | otherwise = Just $ PC.mkRefineException @(LessThanEq n) @a err
     where
@@ -136,10 +136,10 @@ instance
 -- | Predicate for @x = 'LessThan' n@ implies \(x < n \).
 --
 -- ==== __Examples__
--- >>> validate @(LessThan 5) Proxy 4
+-- >>> satisfies @(LessThan 5) Proxy 4
 -- Nothing
 --
--- >>> validate @(LessThan 5) Proxy 5
+-- >>> satisfies @(LessThan 5) Proxy 5
 -- Just (MkRefineException {predRep = LessThan 5, targetRep = Integer, msg = "5 does not satisfy < 5"})
 --
 -- @since 0.1.0.0
@@ -152,7 +152,7 @@ instance
   (KnownNat n, Num a, Ord a, Show a, Typeable a) =>
   Predicate (LessThan n) a
   where
-  validate _ x
+  satisfies _ x
     | x < n' = Nothing
     | otherwise = Just $ PC.mkRefineException @(LessThan n) @a err
     where
@@ -162,10 +162,10 @@ instance
 -- | Predicate for non-positive types, i.e. \(n \leq 0\).
 --
 -- ==== __Examples__
--- >>> validate @NonPositive Proxy 0
+-- >>> satisfies @NonPositive Proxy 0
 -- Nothing
 --
--- >>> validate @NonPositive Proxy 1
+-- >>> satisfies @NonPositive Proxy 1
 -- Just (MkRefineException {predRep = NonPositive, targetRep = Integer, msg = "1 does not satisfy <= 0"})
 --
 -- @since 0.1.0.0
@@ -177,7 +177,7 @@ instance
   (Num a, Ord a, Show a, Typeable a) =>
   Predicate NonPositive a
   where
-  validate _ x
+  satisfies _ x
     | x <= 0 = Nothing
     | otherwise = Just $ PC.mkRefineException @NonPositive @a err
     where
@@ -186,10 +186,10 @@ instance
 -- | Predicate for non-positive types, i.e. \(n < 0\).
 --
 -- ==== __Examples__
--- >>> validate @Negative Proxy (-2)
+-- >>> satisfies @Negative Proxy (-2)
 -- Nothing
 --
--- >>> validate @Negative Proxy 0
+-- >>> satisfies @Negative Proxy 0
 -- Just (MkRefineException {predRep = Negative, targetRep = Integer, msg = "0 does not satisfy < 0"})
 --
 -- @since 0.1.0.0
@@ -201,7 +201,7 @@ instance
   (Num a, Ord a, Show a, Typeable a) =>
   Predicate Negative a
   where
-  validate _ x
+  satisfies _ x
     | x < 0 = Nothing
     | otherwise = Just $ PC.mkRefineException @Negative @a err
     where
@@ -210,10 +210,10 @@ instance
 -- | Predicate for even integral types.
 --
 -- ==== __Examples__
--- >>> validate @Even Proxy 4
+-- >>> satisfies @Even Proxy 4
 -- Nothing
 --
--- >>> validate @Even Proxy 7
+-- >>> satisfies @Even Proxy 7
 -- Just (MkRefineException {predRep = Even, targetRep = Integer, msg = "7 is not even"})
 --
 -- @since 0.1.0.0
@@ -222,7 +222,7 @@ data Even
 
 -- | @since 0.1.0.0
 instance forall a. (Integral a, Show a, Typeable a) => Predicate Even a where
-  validate _ x
+  satisfies _ x
     | even x = Nothing
     | otherwise = Just $ PC.mkRefineException @Even @a err
     where
@@ -231,10 +231,10 @@ instance forall a. (Integral a, Show a, Typeable a) => Predicate Even a where
 -- | Predicate for odd integral types.
 --
 -- ==== __Examples__
--- >>> validate @Odd Proxy 5
+-- >>> satisfies @Odd Proxy 5
 -- Nothing
 --
--- >>> validate @Odd Proxy 4
+-- >>> satisfies @Odd Proxy 4
 -- Just (MkRefineException {predRep = Odd, targetRep = Integer, msg = "4 is not odd"})
 --
 -- @since 0.1.0.0
@@ -243,7 +243,7 @@ data Odd
 
 -- | @since 0.1.0.0
 instance forall a. (Integral a, Show a, Typeable a) => Predicate Odd a where
-  validate _ x
+  satisfies _ x
     | odd x = Nothing
     | otherwise = Just $ PC.mkRefineException @Odd @a err
     where

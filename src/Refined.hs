@@ -95,7 +95,7 @@ refineEmpty = UnsafeRefined
 --
 -- @since 0.1.0.0
 refine :: forall p a. Predicate p a => a -> Either RefineException (Refined '[p] a)
-refine x = case validate @p Proxy x of
+refine x = case satisfies @p Proxy x of
   Nothing -> Right $ UnsafeRefined x
   Just ex -> Left ex
 
@@ -186,7 +186,7 @@ refine5 = refine4 @p @q @r @s >=> addPred @t
 --
 -- @since 0.1.0.0
 refineTH :: forall p a. (Predicate p a, Lift a) => a -> Q (TExp (Refined '[p] a))
-refineTH x = case validate @p Proxy x of
+refineTH x = case satisfies @p Proxy x of
   Nothing -> TH.TExp <$> TH.lift (UnsafeRefined x)
   Just err -> error $ "Error validating Predicate in refineTH: " <> show err
 
@@ -203,7 +203,7 @@ refineTH2 ::
   (Predicate p a, Predicate q a, Lift a) =>
   a ->
   Q (TExp (Refined (AppendP q '[p]) a))
-refineTH2 x = case validate @p Proxy x *> validate @q Proxy x of
+refineTH2 x = case satisfies @p Proxy x *> satisfies @q Proxy x of
   Nothing -> TH.TExp <$> TH.lift (UnsafeRefined x)
   Just err -> error $ "Error validating Predicate in refineTH2: " <> show err
 
@@ -220,9 +220,9 @@ refineTH3 ::
   (Predicate p a, Predicate q a, Predicate r a, Lift a) =>
   a ->
   Q (TExp (Refined (AppendP r (AppendP q '[p])) a))
-refineTH3 x = case validate @p Proxy x
-  *> validate @q Proxy x
-  *> validate @r Proxy x of
+refineTH3 x = case satisfies @p Proxy x
+  *> satisfies @q Proxy x
+  *> satisfies @r Proxy x of
   Nothing -> TH.TExp <$> TH.lift (UnsafeRefined x)
   Just err -> error $ "Error validating Predicate in refineTH3: " <> show err
 
@@ -239,10 +239,10 @@ refineTH4 ::
   ) =>
   a ->
   Q (TExp (Refined (AppendP s (AppendP r (AppendP q '[p]))) a))
-refineTH4 x = case validate @p Proxy x
-  *> validate @q Proxy x
-  *> validate @r Proxy x
-  *> validate @s Proxy x of
+refineTH4 x = case satisfies @p Proxy x
+  *> satisfies @q Proxy x
+  *> satisfies @r Proxy x
+  *> satisfies @s Proxy x of
   Nothing -> TH.TExp <$> TH.lift (UnsafeRefined x)
   Just err -> error $ "Error validating Predicate in refineTH4: " <> show err
 
@@ -260,11 +260,11 @@ refineTH5 ::
   ) =>
   a ->
   Q (TExp (Refined (AppendP t (AppendP s (AppendP r (AppendP q '[p])))) a))
-refineTH5 x = case validate @p Proxy x
-  *> validate @q Proxy x
-  *> validate @r Proxy x
-  *> validate @s Proxy x
-  *> validate @t Proxy x of
+refineTH5 x = case satisfies @p Proxy x
+  *> satisfies @q Proxy x
+  *> satisfies @r Proxy x
+  *> satisfies @s Proxy x
+  *> satisfies @t Proxy x of
   Nothing -> TH.TExp <$> TH.lift (UnsafeRefined x)
   Just err -> error $ "Error validating Predicate in refineTH5: " <> show err
 
@@ -276,7 +276,7 @@ refineTH5 x = case validate @p Proxy x
 --
 -- @since 0.1.0.0
 unsafeRefine :: forall p a. Predicate p a => a -> Refined '[p] a
-unsafeRefine x = case validate @p Proxy x of
+unsafeRefine x = case satisfies @p Proxy x of
   Nothing -> UnsafeRefined x
   Just err -> error $ "Error validating Predicate in unsafeRefined: " <> show err
 
@@ -299,7 +299,7 @@ unsafeRefine x = case validate @p Proxy x of
 --
 -- @since 0.1.0.0
 addPred :: forall p ps a. Predicate p a => Refined ps a -> Either RefineException (Refined (AppendP p ps) a)
-addPred (MkRefined x) = case validate @p Proxy x of
+addPred (MkRefined x) = case satisfies @p Proxy x of
   Nothing -> Right $ UnsafeRefined x
   Just ex -> Left ex
 
@@ -317,7 +317,7 @@ addPred (MkRefined x) = case validate @p Proxy x of
 --
 -- @since 0.1.0.0
 unsafeAddPred :: forall p ps a. Predicate p a => Refined ps a -> Refined (AppendP p ps) a
-unsafeAddPred (MkRefined x) = case validate @p Proxy x of
+unsafeAddPred (MkRefined x) = case satisfies @p Proxy x of
   Nothing -> UnsafeRefined x
   Just ex -> error $ show ex
 

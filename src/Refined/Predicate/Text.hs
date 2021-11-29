@@ -21,10 +21,10 @@ import Refined.Predicate.Class qualified as PC
 
 -- | Predicate for text with alpha characters only.
 --
--- >>> validate @Alpha Proxy "cat"
+-- >>> satisfies @Alpha Proxy "cat"
 -- Nothing
 --
--- >>> validate @Alpha Proxy "cat5"
+-- >>> satisfies @Alpha Proxy "cat5"
 -- Just (MkRefineException {predRep = Alpha, targetRep = [Char], msg = "\"cat5\" is not alphabetic characters"})
 --
 -- @since 0.1.0.0
@@ -33,7 +33,7 @@ data Alpha
 
 -- | @since 0.1.0.0
 instance Predicate Alpha Text where
-  validate _ txt
+  satisfies _ txt
     | T.all C.isAlpha txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Alpha @Text err
     where
@@ -41,7 +41,7 @@ instance Predicate Alpha Text where
 
 -- | @since 0.1.0.0
 instance Predicate Alpha String where
-  validate _ txt
+  satisfies _ txt
     | all C.isAlpha txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Alpha @String err
     where
@@ -49,10 +49,10 @@ instance Predicate Alpha String where
 
 -- | Predicate for text with numeric characters only.
 --
--- >>> validate @Numeric Proxy "123"
+-- >>> satisfies @Numeric Proxy "123"
 -- Nothing
 --
--- >>> validate @Numeric Proxy "123abc"
+-- >>> satisfies @Numeric Proxy "123abc"
 -- Just (MkRefineException {predRep = Alpha, targetRep = [Char], msg = "\"123abc\" is not numeric characters"})
 --
 -- @since 0.1.0.0
@@ -61,7 +61,7 @@ data Numeric
 
 -- | @since 0.1.0.0
 instance Predicate Numeric Text where
-  validate _ txt
+  satisfies _ txt
     | T.all C.isNumber txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Alpha @Text err
     where
@@ -69,7 +69,7 @@ instance Predicate Numeric Text where
 
 -- | @since 0.1.0.0
 instance Predicate Numeric String where
-  validate _ txt
+  satisfies _ txt
     | all C.isNumber txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Alpha @String err
     where
@@ -77,10 +77,10 @@ instance Predicate Numeric String where
 
 -- | Predicate for text with alpha or numeric characters only.
 --
--- >>> validate @AlphaNumeric Proxy "abc123"
+-- >>> satisfies @AlphaNumeric Proxy "abc123"
 -- Nothing
 --
--- >>> validate @AlphaNumeric Proxy "abc123!"
+-- >>> satisfies @AlphaNumeric Proxy "abc123!"
 -- Just (MkRefineException {predRep = Alpha, targetRep = [Char], msg = "\"abc123!\" is not alpha-numeric characters"})
 --
 -- @since 0.1.0.0
@@ -89,7 +89,7 @@ data AlphaNumeric
 
 -- | @since 0.1.0.0
 instance Predicate AlphaNumeric Text where
-  validate _ txt
+  satisfies _ txt
     | T.all C.isAlphaNum txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Alpha @Text err
     where
@@ -97,7 +97,7 @@ instance Predicate AlphaNumeric Text where
 
 -- | @since 0.1.0.0
 instance Predicate AlphaNumeric String where
-  validate _ txt
+  satisfies _ txt
     | all C.isAlphaNum txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Alpha @String err
     where
@@ -105,10 +105,10 @@ instance Predicate AlphaNumeric String where
 
 -- | Predicate for lower-case text only.
 --
--- >>> validate @Lower Proxy "cat"
+-- >>> satisfies @Lower Proxy "cat"
 -- Nothing
 --
--- >>> validate @Lower Proxy "CAT"
+-- >>> satisfies @Lower Proxy "CAT"
 -- Just (MkRefineException {predRep = Alpha, targetRep = [Char], msg = "\"CAT\" is not lowercase"})
 --
 -- @since 0.1.0.0
@@ -117,7 +117,7 @@ data Lower
 
 -- | @since 0.1.0.0
 instance Predicate Lower Text where
-  validate _ txt
+  satisfies _ txt
     | T.all C.isLower txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Alpha @Text err
     where
@@ -125,7 +125,7 @@ instance Predicate Lower Text where
 
 -- | @since 0.1.0.0
 instance Predicate Lower String where
-  validate _ txt
+  satisfies _ txt
     | all C.isLower txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Alpha @String err
     where
@@ -133,10 +133,10 @@ instance Predicate Lower String where
 
 -- | Predicate for lower-case text only.
 --
--- >>> validate @Upper Proxy "CAT"
+-- >>> satisfies @Upper Proxy "CAT"
 -- Nothing
 --
--- >>> validate @Upper Proxy "cat"
+-- >>> satisfies @Upper Proxy "cat"
 -- Just (MkRefineException {predRep = Alpha, targetRep = [Char], msg = "\"cat\" is not uppercase"})
 --
 -- @since 0.1.0.0
@@ -145,7 +145,7 @@ data Upper
 
 -- | @since 0.1.0.0
 instance Predicate Upper Text where
-  validate _ txt
+  satisfies _ txt
     | T.all C.isUpper txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Alpha @Text err
     where
@@ -153,7 +153,7 @@ instance Predicate Upper Text where
 
 -- | @since 0.1.0.0
 instance Predicate Upper String where
-  validate _ txt
+  satisfies _ txt
     | all C.isUpper txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Alpha @String err
     where
@@ -161,10 +161,10 @@ instance Predicate Upper String where
 
 -- | Predicate for hexadecimal text only.
 --
--- >>> validate @Hex Proxy "ad381f5c"
+-- >>> satisfies @Hex Proxy "ad381f5c"
 -- Nothing
 --
--- >>> validate @Hex Proxy "ad381f5cxe"
+-- >>> satisfies @Hex Proxy "ad381f5cxe"
 -- Just (MkRefineException {predRep = Hex, targetRep = [Char], msg = "\"ad381f5cxe\" is not hex"})
 --
 -- @since 0.1.0.0
@@ -173,7 +173,7 @@ data Hex
 
 -- | @since 0.1.0.0
 instance Predicate Hex Text where
-  validate _ txt
+  satisfies _ txt
     | T.all C.isHexDigit txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Hex @Text err
     where
@@ -181,7 +181,7 @@ instance Predicate Hex Text where
 
 -- | @since 0.1.0.0
 instance Predicate Hex String where
-  validate _ txt
+  satisfies _ txt
     | all C.isHexDigit txt = Nothing
     | otherwise = Just $ PC.mkRefineException @Hex @String err
     where

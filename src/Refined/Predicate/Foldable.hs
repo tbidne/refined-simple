@@ -29,10 +29,10 @@ import Refined.Predicate.Class qualified as PC
 -- | Predicate for non-empty.
 --
 -- ==== __Examples__
--- >>> validate @NonEmpty Proxy [1]
+-- >>> satisfies @NonEmpty Proxy [1]
 -- Nothing
 --
--- >>> validate @NonEmpty @Text Proxy ""
+-- >>> satisfies @NonEmpty @Text Proxy ""
 -- Just (MkRefineException {predRep = NonEmpty, targetRep = Text, msg = "\"\" is empty"})
 --
 -- @since 0.1.0.0
@@ -45,14 +45,14 @@ instance
   (Foldable f, Typeable f, Show (f a), Typeable a) =>
   Predicate NonEmpty (f a)
   where
-  validate _ xs
+  satisfies _ xs
     | (not . null) xs = Nothing
     | otherwise = Just $ PC.mkRefineException @NonEmpty @(f a) err
     where
       err = show xs <> " is empty"
 
 instance Predicate NonEmpty Text where
-  validate _ txt
+  satisfies _ txt
     | (not . T.null) txt = Nothing
     | otherwise = Just $ PC.mkRefineException @NonEmpty @Text err
     where
@@ -61,10 +61,10 @@ instance Predicate NonEmpty Text where
 -- | Predicate for maximum length.
 --
 -- ==== __Examples__
--- >>> validate @(MaxLength 4) Proxy [1..4]
+-- >>> satisfies @(MaxLength 4) Proxy [1..4]
 -- Nothing
 --
--- >>> validate @(MaxLength 4) Proxy [1..5]
+-- >>> satisfies @(MaxLength 4) Proxy [1..5]
 -- Just (MkRefineException {predRep = MaxLength 4, targetRep = [Integer], msg = "[1,2,3,4,5] does not satisfy length <= 4"})
 --
 -- @since 0.1.0.0
@@ -77,7 +77,7 @@ instance
   (Foldable f, KnownNat n, Typeable f, Show (f a), Typeable a) =>
   Predicate (MaxLength n) (f a)
   where
-  validate _ xs
+  satisfies _ xs
     | length xs <= len = Nothing
     | otherwise = Just $ PC.mkRefineException @(MaxLength n) @(f a) err
     where
@@ -85,7 +85,7 @@ instance
       err = show xs <> " does not satisfy length <= " <> show len
 
 instance KnownNat n => Predicate (MaxLength n) Text where
-  validate _ txt
+  satisfies _ txt
     | T.length txt <= len = Nothing
     | otherwise = Just $ PC.mkRefineException @(MaxLength n) @Text err
     where
@@ -95,10 +95,10 @@ instance KnownNat n => Predicate (MaxLength n) Text where
 -- | Predicate for minimum length.
 --
 -- ==== __Examples__
--- >>> validate @(MinLength 5) Proxy [1..10]
+-- >>> satisfies @(MinLength 5) Proxy [1..10]
 -- Nothing
 --
--- >>> validate @(MinLength 5) Proxy [1..4]
+-- >>> satisfies @(MinLength 5) Proxy [1..4]
 -- Just (MkRefineException {predRep = MinLength 5, targetRep = [Integer], msg = "[1,2,3,4] does not satisfy length >= 5"})
 --
 -- @since 0.1.0.0
@@ -111,7 +111,7 @@ instance
   (Foldable f, KnownNat n, Typeable f, Show (f a), Typeable a) =>
   Predicate (MinLength n) (f a)
   where
-  validate _ xs
+  satisfies _ xs
     | length xs >= len = Nothing
     | otherwise = Just $ PC.mkRefineException @(MinLength n) @(f a) err
     where
@@ -119,7 +119,7 @@ instance
       err = show xs <> " does not satisfy length >= " <> show len
 
 instance KnownNat n => Predicate (MinLength n) Text where
-  validate _ txt
+  satisfies _ txt
     | T.length txt >= len = Nothing
     | otherwise = Just $ PC.mkRefineException @(MinLength n) @Text err
     where
@@ -129,10 +129,10 @@ instance KnownNat n => Predicate (MinLength n) Text where
 -- | Predicate for exact length.
 --
 -- ==== __Examples__
--- >>> validate @(ExactLength 5) Proxy [1..5]
+-- >>> satisfies @(ExactLength 5) Proxy [1..5]
 -- Nothing
 --
--- >>> validate @(ExactLength 5) Proxy [1..4]
+-- >>> satisfies @(ExactLength 5) Proxy [1..4]
 -- Just (MkRefineException {predRep = ExactLength 5, targetRep = [Integer], msg = "[1,2,3,4] does not satisfy length == 5"})
 --
 -- @since 0.1.0.0
@@ -145,7 +145,7 @@ instance
   (Foldable f, KnownNat n, Typeable f, Show (f a), Typeable a) =>
   Predicate (ExactLength n) (f a)
   where
-  validate _ xs
+  satisfies _ xs
     | length xs == len = Nothing
     | otherwise = Just $ PC.mkRefineException @(ExactLength n) @(f a) err
     where
@@ -154,7 +154,7 @@ instance
 
 -- | @since 0.1.0.0
 instance forall n. (KnownNat n) => Predicate (ExactLength n) Text where
-  validate _ txt
+  satisfies _ txt
     | T.length txt == len = Nothing
     | otherwise = Just $ PC.mkRefineException @(ExactLength n) @Text err
     where
@@ -164,10 +164,10 @@ instance forall n. (KnownNat n) => Predicate (ExactLength n) Text where
 -- | Predicate for increasing.
 --
 -- ==== __Examples__
--- >>> validate @Increasing Proxy [1,1,3,4,5]
+-- >>> satisfies @Increasing Proxy [1,1,3,4,5]
 -- Nothing
 --
--- >>> validate @Increasing Proxy [1,2,5,3]
+-- >>> satisfies @Increasing Proxy [1,2,5,3]
 -- Just (MkRefineException {predRep = Increasing, targetRep = [Integer], msg = "[1,2,5,3] is not increasing."})
 --
 -- @since 0.1.0.0
@@ -180,7 +180,7 @@ instance
   (Foldable f, Ord a, Show (f a), Typeable f, Typeable a) =>
   Predicate Increasing (f a)
   where
-  validate _ xs
+  satisfies _ xs
     | inOrder (>=) xs = Nothing
     | otherwise = Just $ PC.mkRefineException @Increasing @(f a) err
     where
@@ -188,7 +188,7 @@ instance
 
 -- | @since 0.1.0.0
 instance Predicate Increasing Text where
-  validate _ txt
+  satisfies _ txt
     | inOrder (>=) str = Nothing
     | otherwise = Just $ PC.mkRefineException @Increasing @Text err
     where
@@ -198,10 +198,10 @@ instance Predicate Increasing Text where
 -- | Predicate for strictly increasing.
 --
 -- ==== __Examples__
--- >>> validate @StrictlyIncreasing Proxy [1,3,4,10]
+-- >>> satisfies @StrictlyIncreasing Proxy [1,3,4,10]
 -- Nothing
 --
--- >>> validate @StrictlyIncreasing Proxy [1,1,2,5]
+-- >>> satisfies @StrictlyIncreasing Proxy [1,1,2,5]
 -- Just (MkRefineException {predRep = StrictlyIncreasing, targetRep = [Integer], msg = "[1,1,2,5] is not strictly increasing."})
 --
 -- @since 0.1.0.0
@@ -214,7 +214,7 @@ instance
   (Foldable f, Ord a, Show (f a), Typeable f, Typeable a) =>
   Predicate StrictlyIncreasing (f a)
   where
-  validate _ xs
+  satisfies _ xs
     | inOrder (>) xs = Nothing
     | otherwise = Just $ PC.mkRefineException @StrictlyIncreasing @(f a) err
     where
@@ -222,7 +222,7 @@ instance
 
 -- | @since 0.1.0.0
 instance Predicate StrictlyIncreasing Text where
-  validate _ txt
+  satisfies _ txt
     | inOrder (>) str = Nothing
     | otherwise = Just $ PC.mkRefineException @StrictlyIncreasing @Text err
     where
@@ -232,10 +232,10 @@ instance Predicate StrictlyIncreasing Text where
 -- | Predicate for decreasing.
 --
 -- ==== __Examples__
--- >>> validate @Decreasing Proxy [5,4,4,3,1]
+-- >>> satisfies @Decreasing Proxy [5,4,4,3,1]
 -- Nothing
 --
--- >>> validate @Decreasing Proxy [5,4,4,6,1]
+-- >>> satisfies @Decreasing Proxy [5,4,4,6,1]
 -- Just (MkRefineException {predRep = Decreasing, targetRep = [Integer], msg = "[5,4,4,6,1] is not decreasing."})
 --
 -- @since 0.1.0.0
@@ -248,7 +248,7 @@ instance
   (Foldable f, Ord a, Show (f a), Typeable f, Typeable a) =>
   Predicate Decreasing (f a)
   where
-  validate _ xs
+  satisfies _ xs
     | inOrder (<=) xs = Nothing
     | otherwise = Just $ PC.mkRefineException @Decreasing @(f a) err
     where
@@ -256,7 +256,7 @@ instance
 
 -- | @since 0.1.0.0
 instance Predicate Decreasing Text where
-  validate _ txt
+  satisfies _ txt
     | inOrder (<=) str = Nothing
     | otherwise = Just $ PC.mkRefineException @Decreasing @Text err
     where
@@ -266,10 +266,10 @@ instance Predicate Decreasing Text where
 -- | Predicate for strictly decreasing.
 --
 -- ==== __Examples__
--- >>> validate @StrictlyDecreasing Proxy [6,4,3,1]
+-- >>> satisfies @StrictlyDecreasing Proxy [6,4,3,1]
 -- Nothing
 --
--- >>> validate @StrictlyDecreasing Proxy [5,4,4,2,1]
+-- >>> satisfies @StrictlyDecreasing Proxy [5,4,4,2,1]
 -- Just (MkRefineException {predRep = StrictlyDecreasing, targetRep = [Integer], msg = "[5,4,4,2,1] is not strictly decreasing."})
 --
 -- @since 0.1.0.0
@@ -282,7 +282,7 @@ instance
   (Foldable f, Ord a, Show (f a), Typeable f, Typeable a) =>
   Predicate StrictlyDecreasing (f a)
   where
-  validate _ xs
+  satisfies _ xs
     | inOrder (<) xs = Nothing
     | otherwise = Just $ PC.mkRefineException @StrictlyDecreasing @(f a) err
     where
@@ -290,7 +290,7 @@ instance
 
 -- | @since 0.1.0.0
 instance Predicate StrictlyDecreasing Text where
-  validate _ txt
+  satisfies _ txt
     | inOrder (<) str = Nothing
     | otherwise = Just $ PC.mkRefineException @StrictlyDecreasing @Text err
     where
