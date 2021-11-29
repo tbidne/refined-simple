@@ -29,10 +29,10 @@ module Refined
     Predicate (..),
 
     -- ** Operators
-    P.Not,
-    P.Or,
+    Not,
+    Or,
     type (\/),
-    P.Xor,
+    Xor,
     type (<-/->),
 
     -- ** Proving
@@ -67,7 +67,14 @@ import GHC.TypeLits (ErrorMessage (..), TypeError)
 import Language.Haskell.TH.Syntax (Lift, Q, TExp)
 import Language.Haskell.TH.Syntax qualified as TH
 import Refined.Internal (RefineException (..), Refined (..))
-import Refined.Predicate (Predicate (..), type (<-/->), type (\/))
+import Refined.Predicate
+  ( Not,
+    Or,
+    Predicate (..),
+    Xor,
+    type (<-/->),
+    type (\/),
+  )
 import Refined.Predicate qualified as P
 import Refined.Predicate.Foldable
 import Refined.Predicate.Math
@@ -297,7 +304,7 @@ unsafeRefine x = case satisfies @p Proxy x of
 -- >>>     y = addPred @NonZero x
 -- >>> :type y
 -- y :: Either
---        RefineException (Refined '[GreaterThanEq 0, NotEquals 0] Int)
+--        RefineException (Refined '[GreaterThanEq 0, Not (NatEquals 0)] Int)
 --
 -- >>> y
 -- Right (UnsafeRefined {unrefine = 7})
@@ -319,7 +326,7 @@ addPred (MkRefined x) = case satisfies @p Proxy x of
 -- >>> let x = unsafeRefine @NonNegative @Int 7
 -- >>>     y = unsafeAddPred @NonZero x
 -- >>> :type y
--- y :: Refined '[GreaterThanEq 0, NotEquals 0] Int
+-- y :: Refined '[GreaterThanEq 0, Not (NatEquals 0)] Int
 --
 -- >>> y
 -- UnsafeRefined {unrefine = 7}
@@ -413,28 +420,28 @@ type family ImpliesBool ps p where
 -- \]
 --
 -- ==== __Examples__
--- >>> :kind! ImpliesBoolExpr (P.Not NonZero) (NonNegative)
--- ImpliesBoolExpr (P.Not NonZero) (NonNegative) :: Bool
+-- >>> :kind! ImpliesBoolExpr (Not NonZero) (NonNegative)
+-- ImpliesBoolExpr (Not NonZero) (NonNegative) :: Bool
 -- = 'False
 --
--- >>> :kind! ImpliesBoolExpr (P.Not (P.Not NonNegative)) NonNegative
--- ImpliesBoolExpr (P.Not (P.Not NonNegative)) NonNegative :: Bool
+-- >>> :kind! ImpliesBoolExpr (Not (Not NonNegative)) NonNegative
+-- ImpliesBoolExpr (Not (Not NonNegative)) NonNegative :: Bool
 -- = 'True
 --
 -- >>> :kind! ImpliesBoolExpr (NonZero \/ Alpha) NonZero
 -- ImpliesBoolExpr (NonZero \/ Alpha) NonZero :: Bool
 -- = 'False
 --
--- >>> :kind! ImpliesBoolExpr (Alpha \/ (P.Not (P.Not Alpha))) Alpha
--- ImpliesBoolExpr (Alpha \/ (P.Not (P.Not Alpha))) Alpha :: Bool
+-- >>> :kind! ImpliesBoolExpr (Alpha \/ (Not (Not Alpha))) Alpha
+-- ImpliesBoolExpr (Alpha \/ (Not (Not Alpha))) Alpha :: Bool
 -- = 'True
 --
 -- @since 0.1.0.0
 type ImpliesBoolExpr :: Type -> Type -> Bool
 type family ImpliesBoolExpr expr p where
   ImpliesBoolExpr p p = 'True
-  ImpliesBoolExpr (P.Not p) p = 'False
-  ImpliesBoolExpr (P.Not expr) p = ImpliesBoolExpr expr (P.Not p)
+  ImpliesBoolExpr (Not p) p = 'False
+  ImpliesBoolExpr (Not expr) p = ImpliesBoolExpr expr (Not p)
   ImpliesBoolExpr (e1 \/ e2) p = ImpliesBoolExpr e1 p B.&& ImpliesBoolExpr e2 p
   ImpliesBoolExpr (e1 <-/-> e2) p = ImpliesBoolExpr e1 p B.&& ImpliesBoolExpr e2 p
   ImpliesBoolExpr q p = 'False

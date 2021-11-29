@@ -4,8 +4,12 @@
 --
 -- @since 0.1.0.0
 module Refined.Predicate.Math
-  ( NotEquals,
+  ( -- * Equalities
+    NatEquals,
+    NatNotEquals,
     NonZero,
+
+    -- * Inequalities
     GreaterThanEq,
     NonNegative,
     GreaterThan,
@@ -14,6 +18,8 @@ module Refined.Predicate.Math
     NonPositive,
     LessThan,
     Negative,
+
+    -- * Misc
     Even,
     Odd,
   )
@@ -25,35 +31,50 @@ import GHC.TypeNats (KnownNat, Nat)
 import GHC.TypeNats qualified as TN
 import Refined.Predicate.Class (Predicate (..))
 import Refined.Predicate.Class qualified as PC
+import Refined.Predicate.Operators (Not)
 
--- | Predicate for @x = 'NotEquals' n@ implies \(x \ne n \).
+-- | Predicate for @x = 'NatEquals' n@ implies \(x = n \).
 --
 -- ==== __Examples__
--- >>> satisfies @(NotEquals 5) Proxy 10
+-- >>> satisfies @(NatEquals 5) Proxy 5
 -- Nothing
 --
--- >>> satisfies @(NotEquals 5) Proxy 5
--- Just (MkRefineException {predRep = NotEquals 5, targetRep = Integer, msg = "5 does not satisfy /= 5"})
+-- >>> satisfies @(NatEquals 5) Proxy 10
+-- Just (MkRefineException {predRep = NatEquals 5, targetRep = Integer, msg = "10 does not satisfy == 5"})
 --
 -- @since 0.1.0.0
-type NotEquals :: Nat -> Type
-data NotEquals n
+type NatEquals :: Nat -> Type
+data NatEquals n
 
--- | 'NotEquals' specialized to zero.
+-- | @since 0.1.0.0
+instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate (NatEquals n) a where
+  satisfies _ x
+    | x == n' = Nothing
+    | otherwise = Just $ PC.mkRefineException @(NatEquals n) @a err
+    where
+      n' = fromIntegral $ natVal' @n
+      err = show x <> " does not satisfy == " <> show n'
+
+-- | Predicate for @x = 'NatNotEquals' n@ implies \(x \ne n \).
+--
+-- ==== __Examples__
+-- >>> satisfies @(NatNotEquals 5) Proxy 10
+-- Nothing
+--
+-- >>> satisfies @(NatNotEquals 5) Proxy 5
+-- Just (MkRefineException {predRep = Not (NatEquals 5), targetRep = Integer, msg = "5 does not satisfy (Not (NatEquals 5))"})
+--
+-- @since 0.1.0.0
+type NatNotEquals :: Nat -> Type
+
+type NatNotEquals n = Not (NatEquals n)
+
+-- | 'NatNotEquals' specialized to zero.
 --
 -- @since 0.1.0.0
 type NonZero :: Type
 
-type NonZero = NotEquals 0
-
--- | @since 0.1.0.0
-instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate (NotEquals n) a where
-  satisfies _ x
-    | x /= n' = Nothing
-    | otherwise = Just $ PC.mkRefineException @(NotEquals n) @a err
-    where
-      n' = fromIntegral $ natVal' @n
-      err = show x <> " does not satisfy /= " <> show n'
+type NonZero = NatNotEquals 0
 
 -- | Predicate for @x = 'GreaterThanEq' n@ implies \(x \geq n \).
 --

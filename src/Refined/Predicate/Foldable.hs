@@ -336,7 +336,7 @@ inOrder compFn xs = case F.foldl' f Nil xs of
 -- Nothing
 --
 -- >>> satisfies @(All NonZero) Proxy [0..5]
--- Just (MkRefineException {predRep = NotEquals 0, targetRep = Integer, msg = "0 does not satisfy /= 0"})
+-- Just (MkRefineException {predRep = Not (NatEquals 0), targetRep = Integer, msg = "0 does not satisfy (Not (NatEquals 0))"})
 --
 -- @since 0.1.0.0
 type All :: Type -> Type
@@ -352,14 +352,14 @@ instance (Predicate p Char, Typeable p) => Predicate (All p) Text where
     where
       str = T.unpack txt
 
--- | Predicate for all elements satisfying some predicate.
+-- | Predicate for any element satisfying some predicate.
 --
 -- ==== __Examples__
 -- >>> satisfies @(Any NonZero) Proxy [0,0,0,4]
 -- Nothing
 --
 -- >>> satisfies @(Any NonZero) Proxy [0,0,0]
--- Just (MkRefineException {predRep = NotEquals 0, targetRep = Integer, msg = "No element satisfied predicate"})
+-- Just (MkRefineException {predRep = Not (NatEquals 0), targetRep = Integer, msg = "No element satisfied predicate"})
 --
 -- @since 0.1.0.0
 type Any :: Type -> Type
