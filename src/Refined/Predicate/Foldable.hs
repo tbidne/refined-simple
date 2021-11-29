@@ -19,6 +19,7 @@ module Refined.Predicate.Foldable
     -- * Elements
     All,
     Any,
+    None,
   )
 where
 
@@ -32,6 +33,7 @@ import GHC.TypeNats (KnownNat, Nat)
 import GHC.TypeNats qualified as TN
 import Refined.Predicate.Class (Predicate (..))
 import Refined.Predicate.Class qualified as PC
+import Refined.Predicate.Operators (Not)
 
 -- $setup
 -- >>> :set -XOverloadedStrings
@@ -377,6 +379,20 @@ instance (Predicate p Char, Typeable p) => Predicate (Any p) Text where
     where
       str = T.unpack txt
       err = PC.mkRefineException @p @Char "No element satisfied predicate"
+
+-- | Predicate for no elements satisfying a predicate.
+--
+-- ==== __Examples__
+-- >>> satisfies @(None (NatEquals 2)) Proxy [3,4,5]
+-- Nothing
+--
+-- >>> satisfies @(None (NatEquals 2)) Proxy [3,4,2,5]
+-- Just (MkRefineException {predRep = Not (Any (NatEquals 2)), targetRep = [Integer], msg = "[3,4,2,5] does not satisfy (Not (Any (NatEquals 2)))"})
+--
+-- @since 0.1.0.0
+type None :: Type -> Type
+
+type None p = Not (Any p)
 
 allSatisfies :: Foldable f => (a -> Maybe b) -> f a -> Maybe b
 allSatisfies p = foldr (\x acc -> p x <|> acc) Nothing
