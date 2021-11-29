@@ -17,6 +17,7 @@ exts :: [String]
 exts =
   [ "-XDataKinds",
     "-XDerivingVia",
+    "-XFlexibleContexts",
     "-XFlexibleInstances",
     "-XImportQualifiedPost",
     "-XMultiParamTypeClasses",

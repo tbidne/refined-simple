@@ -4,17 +4,25 @@
 --
 -- @since 0.1.0.0
 module Refined.Predicate.Foldable
-  ( NonEmpty,
+  ( -- * Length
+    NonEmpty,
     MaxLength,
     MinLength,
     ExactLength,
+
+    -- * Order
     Increasing,
     StrictlyIncreasing,
     Decreasing,
     StrictlyDecreasing,
+
+    -- * Elements
+    All,
+    Any,
   )
 where
 
+import Control.Applicative ((<|>))
 import Data.Foldable qualified as F
 import Data.Kind (Type)
 import Data.Text (Text)
@@ -27,6 +35,7 @@ import Refined.Predicate.Class qualified as PC
 
 -- $setup
 -- >>> :set -XOverloadedStrings
+-- >>> import Refined.Predicate.Math
 
 -- | Predicate for non-empty.
 --
@@ -319,6 +328,65 @@ inOrder compFn xs = case F.foldl' f Nil xs of
       if x `compFn` y
         then Ordered x
         else Fail
+
+-- | Predicate for all elements satisfying some predicate.
+--
+-- ==== __Examples__
+-- >>> satisfies @(All NonZero) Proxy [1..5]
+-- Nothing
+--
+-- >>> satisfies @(All NonZero) Proxy [0..5]
+-- Just (MkRefineException {predRep = NotEquals 0, targetRep = Integer, msg = "0 does not satisfy /= 0"})
+--
+-- @since 0.1.0.0
+type All :: Type -> Type
+data All p
+
+-- | @since 0.1.0.0
+instance (Foldable f, Predicate p a, Typeable p, Typeable f, Typeable a) => Predicate (All p) (f a) where
+  satisfies _ xs = allSatisfies (satisfies @p Proxy) xs
+
+-- | @since 0.1.0.0
+instance (Predicate p Char, Typeable p) => Predicate (All p) Text where
+  satisfies _ txt = allSatisfies (satisfies @p Proxy) str
+    where
+      str = T.unpack txt
+
+-- | Predicate for all elements satisfying some predicate.
+--
+-- ==== __Examples__
+-- >>> satisfies @(Any NonZero) Proxy [0,0,0,4]
+-- Nothing
+--
+-- >>> satisfies @(Any NonZero) Proxy [0,0,0]
+-- Just (MkRefineException {predRep = NotEquals 0, targetRep = Integer, msg = "No element satisfied predicate"})
+--
+-- @since 0.1.0.0
+type Any :: Type -> Type
+data Any p
+
+-- | @since 0.1.0.0
+instance (Foldable f, Predicate p a, Typeable p, Typeable f, Typeable a) => Predicate (Any p) (f a) where
+  satisfies _ xs = anySatisfies err (satisfies @p Proxy) xs
+    where
+      err = PC.mkRefineException @p @a "No element satisfied predicate"
+
+-- | @since 0.1.0.0
+instance (Predicate p Char, Typeable p) => Predicate (Any p) Text where
+  satisfies _ txt = anySatisfies err (satisfies @p Proxy) str
+    where
+      str = T.unpack txt
+      err = PC.mkRefineException @p @Char "No element satisfied predicate"
+
+allSatisfies :: Foldable f => (a -> Maybe b) -> f a -> Maybe b
+allSatisfies p = foldr (\x acc -> p x <|> acc) Nothing
+
+anySatisfies :: Foldable f => b -> (a -> Maybe b) -> f a -> Maybe b
+anySatisfies defErr p = foldr f (Just defErr)
+  where
+    f x acc = case p x of
+      Just _ -> acc
+      Nothing -> Nothing
 
 natVal' :: forall n. KnownNat n => Integer
 natVal' = toInteger $ TN.natVal (Proxy @n)
