@@ -19,7 +19,7 @@ import Language.Haskell.TH.Syntax (Lift (..))
 -- | This is the core type for 'Refined', a newtype over @a@ that has a
 -- type-level list of attached predicates. The list should be thought of as
 -- a conjunction (AND) of clauses, where each clause is a disjunction (OR) of
--- literals. In other words, the list is in in conjunctive normal form, with
+-- literals. In other words, the list is in conjunctive normal form, with
 -- the caveat that we also allow exclusive disjunction (XOR).
 --
 -- For example,

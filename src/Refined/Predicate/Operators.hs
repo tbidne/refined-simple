@@ -23,11 +23,11 @@ import Refined.Predicate.Class qualified as PC
 -- | Logical negation.
 --
 -- ==== __Examples__
--- >>> satisfies (Proxy @(Not NonZero)) 0
+-- >>> satisfies (Proxy @(Not Positive)) (-2)
 -- Nothing
 --
--- >>> satisfies (Proxy @(Not NonZero)) 7
--- Just (MkRefineException {predRep = Not (Not (NatEquals 0)), targetRep = Integer, msg = "7 does not satisfy (Not (Not (NatEquals 0)))"})
+-- >>> satisfies (Proxy @(Not Positive)) 7
+-- Just (MkRefineException {predRep = Not (GreaterThan 0), targetRep = Integer, msg = "7 does not satisfy (Not (GreaterThan 0))"})
 --
 -- @since 0.1.0.0
 type Not :: Type -> Type
