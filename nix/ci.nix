@@ -1,5 +1,5 @@
 { compiler ? "ghc8107"
-, pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/931ab058daa7e4cd539533963f95e2bb0dbd41e6.tar.gz") { }
+, pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/8a308775674e178495767df90c419425474582a1.tar.gz") { }
 }:
 
 # This file is used for cabal, haddock, and style CI.
