@@ -15,6 +15,9 @@ import Refined.Internal (RefineException (..))
 
 -- | This class is used for defining new predicates.
 --
+-- We include instances for type-level lists so that we can prove multiple
+-- predicates simultaneously.
+--
 -- @since 0.1.0.0
 class (Typeable p, Typeable a) => Predicate p a where
   -- | Validates predicate @p@ for the type @a@. Returns 'Nothing' on success,
@@ -32,3 +35,13 @@ mkRefineException = MkRefineException pTy aTy
   where
     pTy = Ty.typeRep (Proxy @p)
     aTy = Ty.typeRep (Proxy @a)
+
+-- | @since 0.1.0.0
+instance Typeable a => Predicate (Proxy '[]) a where
+  satisfies _ _ = Nothing
+
+-- | @since 0.1.0.0
+instance (Predicate (Proxy ps) a, Predicate p a, Typeable ps, Typeable a) => Predicate (Proxy (p ': ps)) a where
+  satisfies _ x = case satisfies @p @a Proxy x of
+    Nothing -> satisfies @(Proxy ps) Proxy x
+    Just ex -> Just ex

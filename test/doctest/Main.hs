@@ -22,6 +22,7 @@ exts =
     "-XImportQualifiedPost",
     "-XMultiParamTypeClasses",
     "-XPatternSynonyms",
+    "-XOverloadedStrings",
     "-XStandaloneKindSignatures",
     "-XScopedTypeVariables",
     "-XTypeApplications",
