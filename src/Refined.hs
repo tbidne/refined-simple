@@ -143,7 +143,7 @@ refineAll x = case satisfies @(Proxy ps) @a Proxy x of
 -- @since 0.1.0.0
 refineTH :: forall p a. (Predicate p a, Lift a) => a -> Q (TExp (Refined '[p] a))
 refineTH x = case satisfies @p Proxy x of
-  Nothing -> TH.TExp <$> TH.lift (UnsafeRefined x)
+  Nothing -> TH.liftTyped (UnsafeRefined x)
   Just err -> error $ "Error validating Predicate in refineTH: " <> show err
 
 -- | Proves multiple predicates at compile-time via @TemplateHaskell@.
@@ -160,7 +160,7 @@ refineTH x = case satisfies @p Proxy x of
 -- @since 0.1.0.0
 refineAllTH :: forall ps a. (Predicate (Proxy ps) a, Lift a) => a -> Q (TExp (Refined ps a))
 refineAllTH x = case satisfies @(Proxy ps) @a Proxy x of
-  Nothing -> TH.TExp <$> TH.lift (UnsafeRefined x)
+  Nothing -> TH.liftTyped (UnsafeRefined x)
   Just err -> error $ "Error validating Predicate in refineAllTH: " <> show err
 
 -- | Attempts to prove the given predicate. If it succeeds, we return the
