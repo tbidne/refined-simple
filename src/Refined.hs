@@ -1,4 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 -- | This is the main entry point to the library. It provides the core
@@ -57,8 +58,11 @@ import Data.Kind (Constraint, Type)
 import Data.Proxy (Proxy (..))
 import Data.Type.Bool qualified as B
 import GHC.TypeLits (ErrorMessage (..), TypeError)
-import Language.Haskell.TH.Syntax (Lift, Q, TExp)
-import Language.Haskell.TH.Syntax qualified as TH
+#if MIN_VERSION_template_haskell(2, 17, 0)
+import Language.Haskell.TH.Syntax (Code, Lift (..), Q)
+#else
+import Language.Haskell.TH.Syntax (Lift (..), Q, TExp)
+#endif
 import Refined.Internal (RefineException (..), Refined (..))
 import Refined.Predicate
   ( Not,
@@ -141,9 +145,13 @@ refineAll x = case satisfies @(Proxy ps) @a Proxy x of
 -- UnsafeRefined {unrefine = 5}
 --
 -- @since 0.1.0.0
+#if MIN_VERSION_template_haskell(2, 17, 0)
+refineTH :: forall p a. (Predicate p a, Lift a) => a -> Code Q (Refined '[p] a)
+#else
 refineTH :: forall p a. (Predicate p a, Lift a) => a -> Q (TExp (Refined '[p] a))
+#endif
 refineTH x = case satisfies @p Proxy x of
-  Nothing -> TH.liftTyped (UnsafeRefined x)
+  Nothing -> liftTyped (UnsafeRefined x)
   Just err -> error $ "Error validating Predicate in refineTH: " <> show err
 
 -- | Proves multiple predicates at compile-time via @TemplateHaskell@.
@@ -158,9 +166,13 @@ refineTH x = case satisfies @p Proxy x of
 -- UnsafeRefined {unrefine = 5}
 --
 -- @since 0.1.0.0
+#if MIN_VERSION_template_haskell(2, 17, 0)
+refineAllTH :: forall ps a. (Predicate (Proxy ps) a, Lift a) => a -> Code Q (Refined ps a)
+#else
 refineAllTH :: forall ps a. (Predicate (Proxy ps) a, Lift a) => a -> Q (TExp (Refined ps a))
+#endif
 refineAllTH x = case satisfies @(Proxy ps) @a Proxy x of
-  Nothing -> TH.liftTyped (UnsafeRefined x)
+  Nothing -> liftTyped (UnsafeRefined x)
   Just err -> error $ "Error validating Predicate in refineAllTH: " <> show err
 
 -- | Attempts to prove the given predicate. If it succeeds, we return the

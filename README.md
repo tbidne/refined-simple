@@ -2,12 +2,45 @@
 
 # Refined Simple
 
-![cabal](https://github.com/tbidne/refined-simple/workflows/cabal/badge.svg?branch=main)
-![stack](https://github.com/tbidne/refined-simple/workflows/stack/badge.svg?branch=main)
-![nix](https://github.com/tbidne/refined-simple/workflows/nix/badge.svg?branch=main)
-![haddock](https://github.com/tbidne/refined-simple/workflows/haddock/badge.svg?branch=main)
-![style](https://github.com/tbidne/refined-simple/workflows/style/badge.svg?branch=main)
+<a href="https://github.com/tbidne/refined-simple/actions/workflows/cabal_ci.yaml">
+  <img alt="GitHub" src="https://img.shields.io/github/workflow/status/tbidne/refined-simple/cabal/main?label=cabal&logoColor=white&style=plastic">
+</a>
+<a href="https://github.com/tbidne/refined-simple/actions/workflows/stack_ci.yaml">
+  <img alt="GitHub" src="https://img.shields.io/github/workflow/status/tbidne/refined-simple/stack/main?label=stack&logoColor=white&style=plastic">
+</a>
+<a href="https://github.com/tbidne/refined-simple/actions/workflows/nix_ci.yaml">
+  <img alt="GitHub" src="https://img.shields.io/github/workflow/status/tbidne/refined-simple/nix/main?label=nix&logo=nixos&logoColor=white&style=plastic">
+</a>
+<a href="https://github.com/tbidne/refined-simple/actions/workflows/style.yaml">
+  <img alt="GitHub" src="https://img.shields.io/github/workflow/status/tbidne/refined-simple/nix/main?label=style&logoColor=white&style=plastic">
+</a>
+<img alt="GitHub" src="https://img.shields.io/github/license/tbidne/refined-simple?style=plastic&color=blue">
 
+</div>
+
+### GHC Build Matrix
+
+<div align="center">
+<table>
+  <thead>
+    <th><code>refined-simple</code> / GHC</th>
+    <th>9.0.1</th>
+    <th>8.10.7</th>
+  </thead>
+  <tr>
+    <td><code>0.1.0.0</code></td>
+    <td>
+      <a href="https://github.com/tbidne/refined-simple/actions/workflows/ghc_9-0-1.yaml">
+        <img alt="GitHub" src="https://img.shields.io/github/workflow/status/tbidne/refined-simple/9.0.1/ghc?label=9.0.1&logo=haskell&logoColor=white&style=plastic">
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/tbidne/refined-simple/actions/workflows/ghc_8-10-7.yaml">
+        <img alt="GitHub" src="https://img.shields.io/github/workflow/status/tbidne/refined-simple/8.10.7/ghc?label=8.10.7&logo=haskell&logoColor=white&style=plastic">
+      </a>
+    </td>
+  </tr>
+</table>
 </div>
 
 ### Table of Contents

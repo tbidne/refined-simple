@@ -76,8 +76,8 @@ library
     Refined.Predicate.Text
 
   build-depends:
-    , base              >=4.14.0.0 && <4.17
-    , template-haskell  >=2.16.0.0 && <2.18
+    , base              >=4.14.0.0 && <4.16
+    , template-haskell  >=2.16.0.0 && <2.19
     , text              ^>=1.2.3.2
 
   hs-source-dirs:   src
