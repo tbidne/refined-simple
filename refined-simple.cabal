@@ -3,7 +3,7 @@ name:               refined-simple
 version:            0.1.0.0
 license:            MIT
 license-file:       LICENSE
-tested-with:        GHC ==8.10.7 || ==9.0.1
+tested-with:        GHC ==8.10.7 || ==9.0.1 || ==9.2.1
 copyright:          2021 Thomas Bidne
 author:             Thomas Bidne
 maintainer:         tbidne@prontonmail.com
@@ -76,7 +76,7 @@ library
     Refined.Predicate.Text
 
   build-depends:
-    , base              >=4.14.0.0 && <4.16
+    , base              >=4.14.0.0 && <4.17
     , template-haskell  >=2.16.0.0 && <2.19
     , text              ^>=1.2.3.2
 

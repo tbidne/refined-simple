@@ -1,4 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE RoleAnnotations #-}
 {-# LANGUAGE TemplateHaskell #-}
 
@@ -12,6 +13,7 @@ module Refined.Internal
   )
 where
 
+import Control.Exception (Exception (..))
 import Data.Kind (Type)
 import Data.Typeable (TypeRep)
 import Language.Haskell.TH.Syntax (Lift (..))
@@ -91,4 +93,8 @@ data RefineException = MkRefineException
       Ord,
       -- | @since 0.1.0.0
       Show
+    )
+  deriving anyclass
+    ( -- | @since 0.1.0.0
+      Exception
     )

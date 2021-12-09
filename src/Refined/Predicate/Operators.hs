@@ -13,6 +13,7 @@ where
 import Control.Applicative qualified as A
 import Data.Kind (Type)
 import Data.Proxy (Proxy (..))
+import Data.Typeable (Typeable)
 import Data.Typeable qualified as Ty
 import Refined.Predicate.Class (Predicate (..))
 import Refined.Predicate.Class qualified as PC
@@ -34,7 +35,10 @@ type Not :: Type -> Type
 data Not p
 
 -- | @since 0.1.0.0
-instance (Predicate p a, Show a) => Predicate (Not p) a where
+instance
+  (Predicate p a, Show a, Typeable p, Typeable a) =>
+  Predicate (Not p) a
+  where
   satisfies _ x = case satisfies (Proxy @p) x of
     Nothing -> Just $ PC.mkRefineException @(Not p) @a err
     Just _ -> Nothing
@@ -59,7 +63,16 @@ type Or :: Type -> Type -> Type
 data Or p q
 
 -- | @since 0.1.0.0
-instance (Predicate p a, Predicate q a, Show a) => Predicate (Or p q) a where
+instance
+  ( Predicate p a,
+    Predicate q a,
+    Show a,
+    Typeable p,
+    Typeable q,
+    Typeable a
+  ) =>
+  Predicate (Or p q) a
+  where
   satisfies _ x = case A.liftA2 (,) satP satQ of
     Just _ -> Just $ PC.mkRefineException @(Or p q) @a err
     _ -> Nothing
@@ -74,6 +87,8 @@ instance (Predicate p a, Predicate q a, Show a) => Predicate (Or p q) a where
 type (\/) :: Type -> Type -> Type
 
 type (\/) = Or
+
+infixr 2 \/
 
 -- | Logical exclusive disjunction.
 --
@@ -92,7 +107,16 @@ type Xor :: Type -> Type -> Type
 data Xor p q
 
 -- | @since 0.1.0.0
-instance (Predicate p a, Predicate q a, Show a) => Predicate (Xor p q) a where
+instance
+  ( Predicate p a,
+    Predicate q a,
+    Show a,
+    Typeable p,
+    Typeable q,
+    Typeable a
+  ) =>
+  Predicate (Xor p q) a
+  where
   satisfies _ x = case (,) satP satQ of
     (Just _, Just _) -> Just $ PC.mkRefineException @(Xor p q) @a noneErr
     (Nothing, Nothing) -> Just $ PC.mkRefineException @(Xor p q) @a bothErr
@@ -109,3 +133,5 @@ instance (Predicate p a, Predicate q a, Show a) => Predicate (Xor p q) a where
 type (<+>) :: Type -> Type -> Type
 
 type (<+>) = Xor
+
+infixr 3 <+>

@@ -186,7 +186,7 @@ refineAllTH x = case satisfies @(Proxy ps) @a Proxy x of
 unsafeRefine :: forall p a. Predicate p a => a -> Refined '[p] a
 unsafeRefine x = case satisfies @p Proxy x of
   Nothing -> UnsafeRefined x
-  Just err -> error $ "Error validating Predicate in unsafeRefined: " <> show err
+  Just err -> error $ "Error validating Predicate in unsafeRefine: " <> show err
 
 -- | Attempts to prove the given predicates. If it succeeds, we return the
 -- refined @a@. Otherwise we die with a runtime error.

@@ -345,11 +345,11 @@ type All :: Type -> Type
 data All p
 
 -- | @since 0.1.0.0
-instance (Foldable f, Predicate p a, Typeable p, Typeable f, Typeable a) => Predicate (All p) (f a) where
+instance (Foldable f, Predicate p a) => Predicate (All p) (f a) where
   satisfies _ xs = allSatisfies (satisfies @p Proxy) xs
 
 -- | @since 0.1.0.0
-instance (Predicate p Char, Typeable p) => Predicate (All p) Text where
+instance Predicate p Char => Predicate (All p) Text where
   satisfies _ txt = allSatisfies (satisfies @p Proxy) str
     where
       str = T.unpack txt
@@ -368,7 +368,7 @@ type Any :: Type -> Type
 data Any p
 
 -- | @since 0.1.0.0
-instance (Foldable f, Predicate p a, Typeable p, Typeable f, Typeable a) => Predicate (Any p) (f a) where
+instance (Foldable f, Predicate p a, Typeable p, Typeable a) => Predicate (Any p) (f a) where
   satisfies _ xs = anySatisfies err (satisfies @p Proxy) xs
     where
       err = PC.mkRefineException @p @a "No element satisfied predicate"

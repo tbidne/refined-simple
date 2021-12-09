@@ -20,10 +20,17 @@ jobs:
       - name: Setup nix
         uses: cachix/install-nix-action@v12
         with:
-          nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/c71f061c68ba8ce53471b767d5049cbd0f3d8490.tar.gz
+          nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/8a308775674e178495767df90c419425474582a1.tar.gz
 
       - name: Compile
-        run: nix-shell nix/ghc_9-0-1.nix --command "cabal build"
+        run: |
+          nix-shell nix/ghc_9-0-1.nix --command \
+            "cabal update && \
+             cabal build --write-ghc-environment-files=always"
 
       - name: Test
-        run: nix-shell nix/ghc_9-0-1.nix --command "cabal test"
+        run: |
+          nix-shell nix/ghc_9-0-1.nix --command \
+            "cabal update && \
+             cabal build --write-ghc-environment-files=always && \
+             cabal test"
