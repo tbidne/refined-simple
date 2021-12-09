@@ -12,7 +12,7 @@ module Refined.Predicate
     Or,
     type (\/),
     Xor,
-    type (<-/->),
+    type (<+>),
 
     -- * Built-in Predicates
     module Refined.Predicate.Math,

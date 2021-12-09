@@ -15,6 +15,7 @@ module Refined
     refineTH,
     refineAllTH,
     unsafeRefine,
+    unsafeRefineAll,
 
     -- ** RefineException
     RefineException (..),
@@ -28,7 +29,7 @@ module Refined
     Or,
     type (\/),
     Xor,
-    type (<-/->),
+    type (<+>),
 
     -- ** Proving
     addPred,
@@ -69,7 +70,7 @@ import Refined.Predicate
     Or,
     Predicate (..),
     Xor,
-    type (<-/->),
+    type (<+>),
     type (\/),
   )
 import Refined.Predicate qualified as P
@@ -186,6 +187,18 @@ unsafeRefine :: forall p a. Predicate p a => a -> Refined '[p] a
 unsafeRefine x = case satisfies @p Proxy x of
   Nothing -> UnsafeRefined x
   Just err -> error $ "Error validating Predicate in unsafeRefined: " <> show err
+
+-- | Attempts to prove the given predicates. If it succeeds, we return the
+-- refined @a@. Otherwise we die with a runtime error.
+--
+-- >>> unsafeRefineAll @'[NonNegative, Even] 4
+-- UnsafeRefined {unrefine = 4}
+--
+-- @since 0.1.0.0
+unsafeRefineAll :: forall ps a. (Predicate (Proxy ps) a) => a -> Refined ps a
+unsafeRefineAll x = case satisfies @(Proxy ps) Proxy x of
+  Nothing -> UnsafeRefined x
+  Just err -> error $ "Error validating Predicate in unsafeRefineAll: " <> show err
 
 -- | Attempts to prove the given predicate. If it succeeds, we add the
 -- predicate to the list.
@@ -334,7 +347,7 @@ type family ImpliesBoolExpr expr p where
   ImpliesBoolExpr (Not p) p = 'False
   ImpliesBoolExpr (Not expr) p = ImpliesBoolExpr expr (Not p)
   ImpliesBoolExpr (e1 \/ e2) p = ImpliesBoolExpr e1 p B.&& ImpliesBoolExpr e2 p
-  ImpliesBoolExpr (e1 <-/-> e2) p = ImpliesBoolExpr e1 p B.&& ImpliesBoolExpr e2 p
+  ImpliesBoolExpr (e1 <+> e2) p = ImpliesBoolExpr e1 p B.&& ImpliesBoolExpr e2 p
   ImpliesBoolExpr q p = 'False
 
 -- | Emits a 'TypeError' when given 'False'. The parameter type is used in the

@@ -6,7 +6,7 @@ module Refined.Predicate.Operators
     Or,
     type (\/),
     Xor,
-    type (<-/->),
+    type (<+>),
   )
 where
 
@@ -106,6 +106,6 @@ instance (Predicate p a, Predicate q a, Show a) => Predicate (Xor p q) a where
 -- | Infix operator for 'Xor'.
 --
 -- @since 0.1.0.0
-type (<-/->) :: Type -> Type -> Type
+type (<+>) :: Type -> Type -> Type
 
-type (<-/->) = Xor
+type (<+>) = Xor
