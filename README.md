@@ -2,40 +2,19 @@
 
 # Refined Simple
 
-<a href="https://github.com/tbidne/refined-simple/actions/workflows/cabal_ci.yaml">
-  <img alt="GitHub" src="https://img.shields.io/github/workflow/status/tbidne/refined-simple/cabal/main?label=cabal&logoColor=white&style=plastic">
-</a>
-<a href="https://github.com/tbidne/refined-simple/actions/workflows/stack_ci.yaml">
-  <img alt="GitHub" src="https://img.shields.io/github/workflow/status/tbidne/refined-simple/stack/main?label=stack&logoColor=white&style=plastic">
-</a>
-<a href="https://github.com/tbidne/refined-simple/actions/workflows/nix_ci.yaml">
-  <img alt="GitHub" src="https://img.shields.io/github/workflow/status/tbidne/refined-simple/nix/main?label=nix&logo=nixos&logoColor=white&style=plastic">
-</a>
-<a href="https://github.com/tbidne/refined-simple/actions/workflows/style.yaml">
-  <img alt="GitHub" src="https://img.shields.io/github/workflow/status/tbidne/refined-simple/nix/main?label=style&logoColor=white&style=plastic">
-</a>
-<img alt="GitHub" src="https://img.shields.io/github/license/tbidne/refined-simple?style=plastic&color=blue">
+[![Hackage](https://img.shields.io/hackage/v/refined-simple)](https://hackage.haskell.org/package/refined-simple)
+[![Hackage Deps](https://img.shields.io/hackage-deps/v/refined-simple)](http://packdeps.haskellers.com/reverse/refined-simple)
+[![Hackage CI](https://matrix.hackage.haskell.org/api/v2/packages/refined-simplels/badge)](https://matrix.hackage.haskell.org/#/package/refined-simple)
+[![Cabal CI](https://img.shields.io/github/workflow/status/tbidne/refined-simple/cabal/main?label=cabal&logoColor=white)](https://github.com/tbidne/refined-simple/actions/workflows/cabal_ci.yaml)
+[![Stack CI](https://img.shields.io/github/workflow/status/tbidne/refined-simple/stack/main?label=stack&logoColor=white)](https://github.com/tbidne/refined-simple/actions/workflows/stack_ci.yaml)
+[![Nix CI](https://img.shields.io/github/workflow/status/tbidne/refined-simple/nix/main?label=nix&logo=nixos&logoColor=white)](https://github.com/tbidne/refined-simple/actions/workflows/nix_ci.yaml)
+[![MIT](https://img.shields.io/github/license/tbidne/refined-simple?color=blue)](https://opensource.org/licenses/MIT)
 
-<table>
-  <thead>
-    <th><code>refined-simple</code> / GHC</th>
-    <th>9.0.1</th>
-    <th>8.10.7</th>
-  </thead>
-  <tr>
-    <td><code>0.1.0.0</code></td>
-    <td>
-      <a href="https://github.com/tbidne/refined-simple/actions/workflows/ghc_9-0-1.yaml">
-        <img alt="GitHub" src="https://img.shields.io/github/workflow/status/tbidne/refined-simple/9.0.1/main?label=9.0.1&logo=haskell&logoColor=white&style=plastic">
-      </a>
-    </td>
-    <td>
-      <a href="https://github.com/tbidne/refined-simple/actions/workflows/ghc_8-10-7.yaml">
-        <img alt="GitHub" src="https://img.shields.io/github/workflow/status/tbidne/refined-simple/8.10.7/main?label=8.10.7&logo=haskell&logoColor=white&style=plastic">
-      </a>
-    </td>
-  </tr>
-</table>
+|                       | GHC | 9.2.1 | 9.0.1 | 8.10.7
+|:---------------------:|:---:|:-----:|:-----:|:-----:
+`refined-simple`       |     |       |       |
+| [![`0.1.0.0`](https://img.shields.io/badge/release-0.1.0.0-blue)](https://github.com/tbidne/refined-simple/releases/tag/0.1.0.0) | | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
+
 </div>
 
 ### Table of Contents
@@ -199,10 +178,10 @@ On the other hand, refined types give us a solution that is:
 * Refined
   * Only dependencies are `TemplateHaskell` and `Text`, giving `refined-simple` a significantly lighter dependency footprint.
   * Predicate composition is a type-level list (like `facts`), not a combination of logical operators. This makes composition less general than `refined`'s, but it is easier to work with.
+  * Polymorphism over predicates.
 * Facts
   * Fewer dependencies (though `facts` is also light).
   * Simpler API.
-  * More built-in predicates.
-
+  * More built-in functionality (e.g. predicates for foldables, Numbers, Text).
 
 In short: If you want a "batteries included" refined library with the highest ecosystem integration and most flexible composition (and don't mind some transitive dependencies you may not use e.g. `aeson`), check out `refined`. If instead you want a more compact design with a strong mathematical foundation, try `facts`. Finally, if you would ordinarily use smart constructors but are tired of some of the shortcomings, then perhaps give `refined-simple` a try.

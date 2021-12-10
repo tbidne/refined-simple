@@ -24,11 +24,13 @@ description:
   * Predicate composition is a type-level list (like @facts@), not a
   combination of logical operators. This makes composition less general
   than @refined@'s, but it is easier to work with.
+  * Polymorphism over predicates.
   .
   Differences from @facts@:
   .
   * Fewer dependencies (though @facts@ is also light).
   * Simpler API.
+  * More built-in functionality (e.g. predicates for foldables, Numbers, Text).
   .
   In short: If you want a "batteries included" refined library with the
   highest ecosystem integration and most flexible composition (and don't
