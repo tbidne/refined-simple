@@ -73,7 +73,7 @@ library
     Refined.Predicate
     Refined.Predicate.Class
     Refined.Predicate.Foldable
-    Refined.Predicate.Math
+    Refined.Predicate.Nat
     Refined.Predicate.Operators
     Refined.Predicate.Text
 

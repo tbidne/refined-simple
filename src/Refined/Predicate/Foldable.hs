@@ -37,7 +37,7 @@ import Refined.Predicate.Operators (Not)
 
 -- $setup
 -- >>> :set -XOverloadedStrings
--- >>> import Refined.Predicate.Math
+-- >>> import Refined.Predicate.Nat
 
 -- | Predicate for non-empty.
 --
@@ -338,7 +338,7 @@ inOrder compFn xs = case F.foldl' f Nil xs of
 -- Nothing
 --
 -- >>> satisfies @(All NonZero) Proxy [0..5]
--- Just (MkRefineException {predRep = Not (NatEquals 0), targetRep = Integer, msg = "0 does not satisfy (Not (NatEquals 0))"})
+-- Just (MkRefineException {predRep = Not (NatEq 0), targetRep = Integer, msg = "0 does not satisfy (Not (NatEq 0))"})
 --
 -- @since 0.1.0.0
 type All :: Type -> Type
@@ -361,7 +361,7 @@ instance Predicate p Char => Predicate (All p) Text where
 -- Nothing
 --
 -- >>> satisfies @(Any NonZero) Proxy [0,0,0]
--- Just (MkRefineException {predRep = Not (NatEquals 0), targetRep = Integer, msg = "No element satisfied predicate"})
+-- Just (MkRefineException {predRep = Not (NatEq 0), targetRep = Integer, msg = "No element satisfied predicate"})
 --
 -- @since 0.1.0.0
 type Any :: Type -> Type
@@ -383,11 +383,11 @@ instance (Predicate p Char, Typeable p) => Predicate (Any p) Text where
 -- | Predicate for no elements satisfying a predicate.
 --
 -- ==== __Examples__
--- >>> satisfies @(None (NatEquals 2)) Proxy [3,4,5]
+-- >>> satisfies @(None (NatEq 2)) Proxy [3,4,5]
 -- Nothing
 --
--- >>> satisfies @(None (NatEquals 2)) Proxy [3,4,2,5]
--- Just (MkRefineException {predRep = Not (Any (NatEquals 2)), targetRep = [Integer], msg = "[3,4,2,5] does not satisfy (Not (Any (NatEquals 2)))"})
+-- >>> satisfies @(None (NatEq 2)) Proxy [3,4,2,5]
+-- Just (MkRefineException {predRep = Not (Any (NatEq 2)), targetRep = [Integer], msg = "[3,4,2,5] does not satisfy (Not (Any (NatEq 2)))"})
 --
 -- @since 0.1.0.0
 type None :: Type -> Type

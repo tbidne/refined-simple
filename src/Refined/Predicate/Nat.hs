@@ -3,20 +3,20 @@
 -- | Provides predicates for numeric types.
 --
 -- @since 0.1.0.0
-module Refined.Predicate.Math
+module Refined.Predicate.Nat
   ( -- * Equalities
-    NatEquals,
-    NatNotEquals,
+    NatEq,
+    NatNotEq,
     NonZero,
 
     -- * Inequalities
-    GreaterThanEq,
+    NatGTEq,
     NonNegative,
-    GreaterThan,
+    NatGT,
     Positive,
-    LessThanEq,
+    NatLTEq,
     NonPositive,
-    LessThan,
+    NatLT,
     Negative,
 
     -- * Misc
@@ -31,153 +31,133 @@ import GHC.TypeNats (KnownNat, Nat)
 import GHC.TypeNats qualified as TN
 import Refined.Predicate.Class (Predicate (..))
 import Refined.Predicate.Class qualified as PC
-import Refined.Predicate.Operators (Not)
+import Refined.Predicate.Operators (Not, type (\/))
 
--- | Predicate for @x = 'NatEquals' n@ implies \(x = n \).
+-- | Predicate for @x = 'NatEq' n@ implies \(x = n \).
 --
 -- ==== __Examples__
--- >>> satisfies @(NatEquals 5) Proxy 5
+-- >>> satisfies @(NatEq 5) Proxy 5
 -- Nothing
 --
--- >>> satisfies @(NatEquals 5) Proxy 10
--- Just (MkRefineException {predRep = NatEquals 5, targetRep = Integer, msg = "10 does not satisfy == 5"})
+-- >>> satisfies @(NatEq 5) Proxy 10
+-- Just (MkRefineException {predRep = NatEq 5, targetRep = Integer, msg = "10 does not satisfy == 5"})
 --
 -- @since 0.1.0.0
-type NatEquals :: Nat -> Type
-data NatEquals n
+type NatEq :: Nat -> Type
+data NatEq n
 
 -- | @since 0.1.0.0
-instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate (NatEquals n) a where
+instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate (NatEq n) a where
   satisfies _ x
     | x == n' = Nothing
-    | otherwise = Just $ PC.mkRefineException @(NatEquals n) @a err
+    | otherwise = Just $ PC.mkRefineException @(NatEq n) @a err
     where
       n' = fromIntegral $ natVal' @n
       err = show x <> " does not satisfy == " <> show n'
 
--- | Predicate for @x = 'NatNotEquals' n@ implies \(x \ne n \).
+-- | Predicate for @x = 'NatNotEq' n@ implies \(x \ne n \).
 --
 -- ==== __Examples__
--- >>> satisfies @(NatNotEquals 5) Proxy 10
+-- >>> satisfies @(NatNotEq 5) Proxy 10
 -- Nothing
 --
--- >>> satisfies @(NatNotEquals 5) Proxy 5
--- Just (MkRefineException {predRep = Not (NatEquals 5), targetRep = Integer, msg = "5 does not satisfy (Not (NatEquals 5))"})
+-- >>> satisfies @(NatNotEq 5) Proxy 5
+-- Just (MkRefineException {predRep = Not (NatEq 5), targetRep = Integer, msg = "5 does not satisfy (Not (NatEq 5))"})
 --
 -- @since 0.1.0.0
-type NatNotEquals :: Nat -> Type
+type NatNotEq :: Nat -> Type
 
-type NatNotEquals n = Not (NatEquals n)
+type NatNotEq n = Not (NatEq n)
 
--- | 'NatNotEquals' specialized to zero.
+-- | 'NatNotEq' specialized to zero.
 --
 -- @since 0.1.0.0
 type NonZero :: Type
 
-type NonZero = NatNotEquals 0
+type NonZero = NatNotEq 0
 
--- | Predicate for @x = 'GreaterThanEq' n@ implies \(x \geq n \).
+-- | Predicate for @x = 'NatGTEq' n@ implies \(x \geq n \).
 --
 -- ==== __Examples__
--- >>> satisfies @(GreaterThanEq 5) Proxy 5
+-- >>> satisfies @(NatGTEq 5) Proxy 5
 -- Nothing
 --
--- >>> satisfies @(GreaterThanEq 5) Proxy 4
--- Just (MkRefineException {predRep = GreaterThanEq 5, targetRep = Integer, msg = "4 does not satisfy >= 5"})
+-- >>> satisfies @(NatGTEq 5) Proxy 4
+-- Just (MkRefineException {predRep = Or (NatGT 5) (NatEq 5), targetRep = Integer, msg = "4 satisfied neither predicate"})
 --
 -- @since 0.1.0.0
-type GreaterThanEq :: Nat -> Type
-data GreaterThanEq n
+type NatGTEq :: Nat -> Type
 
--- | 'GreaterThanEq' specialized to 0.
+type NatGTEq n = NatGT n \/ NatEq n
+
+-- | 'NatGTEq' specialized to 0.
 --
 -- @since 0.1.0.0
-type NonNegative = GreaterThanEq 0
+type NonNegative = NatGTEq 0
 
--- | @since 0.1.0.0
-instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate (GreaterThanEq n) a where
-  satisfies _ x
-    | x >= n' = Nothing
-    | otherwise = Just $ PC.mkRefineException @(GreaterThanEq n) @a err
-    where
-      n' = fromIntegral $ natVal' @n
-      err = show x <> " does not satisfy >= " <> show n'
-
--- | Predicate for @x = 'GreaterThan' n@ implies \(x > n \).
+-- | Predicate for @x = 'NatGT' n@ implies \(x > n \).
 --
 -- ==== __Examples__
--- >>> satisfies @(GreaterThan 5) Proxy 6
+-- >>> satisfies @(NatGT 5) Proxy 6
 -- Nothing
 --
--- >>> satisfies @(GreaterThan 5) Proxy 5
--- Just (MkRefineException {predRep = GreaterThan 5, targetRep = Integer, msg = "5 does not satisfy > 5"})
+-- >>> satisfies @(NatGT 5) Proxy 5
+-- Just (MkRefineException {predRep = NatGT 5, targetRep = Integer, msg = "5 does not satisfy > 5"})
 --
 -- @since 0.1.0.0
-type GreaterThan :: Nat -> Type
-data GreaterThan n
+type NatGT :: Nat -> Type
+data NatGT n
 
 -- | @since 0.1.0.0
-instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate (GreaterThan n) a where
+instance forall n a. (KnownNat n, Num a, Ord a, Show a, Typeable a) => Predicate (NatGT n) a where
   satisfies _ x
     | x > n' = Nothing
-    | otherwise = Just $ PC.mkRefineException @(GreaterThan n) @a err
+    | otherwise = Just $ PC.mkRefineException @(NatGT n) @a err
     where
       n' = fromIntegral $ natVal' @n
       err = show x <> " does not satisfy > " <> show n'
 
--- | 'GreaterThan' specialized to 0.
+-- | 'NatGT' specialized to 0.
 --
 -- @since 0.1.0.0
-type Positive = GreaterThan 0
+type Positive = NatGT 0
 
--- | Predicate for @x = 'LessThanEq' n@ implies \(x \leq n \).
+-- | Predicate for @x = 'NatLTEq' n@ implies \(x \leq n \).
 --
 -- ==== __Examples__
--- >>> satisfies @(LessThanEq 5) Proxy 5
+-- >>> satisfies @(NatLTEq 5) Proxy 5
 -- Nothing
 --
--- >>> satisfies @(LessThanEq 5) Proxy 6
--- Just (MkRefineException {predRep = LessThanEq 5, targetRep = Integer, msg = "6 does not satisfy <= 5"})
+-- >>> satisfies @(NatLTEq 5) Proxy 6
+-- Just (MkRefineException {predRep = Or (NatLT 5) (NatEq 5), targetRep = Integer, msg = "6 satisfied neither predicate"})
 --
 -- @since 0.1.0.0
-type LessThanEq :: Nat -> Type
-data LessThanEq n
+type NatLTEq :: Nat -> Type
+
+type NatLTEq n = NatLT n \/ NatEq n
+
+-- | Predicate for @x = 'NatLT' n@ implies \(x < n \).
+--
+-- ==== __Examples__
+-- >>> satisfies @(NatLT 5) Proxy 4
+-- Nothing
+--
+-- >>> satisfies @(NatLT 5) Proxy 5
+-- Just (MkRefineException {predRep = NatLT 5, targetRep = Integer, msg = "5 does not satisfy < 5"})
+--
+-- @since 0.1.0.0
+type NatLT :: Nat -> Type
+data NatLT n
 
 -- | @since 0.1.0.0
 instance
   forall n a.
   (KnownNat n, Num a, Ord a, Show a, Typeable a) =>
-  Predicate (LessThanEq n) a
-  where
-  satisfies _ x
-    | x <= n' = Nothing
-    | otherwise = Just $ PC.mkRefineException @(LessThanEq n) @a err
-    where
-      n' = fromIntegral $ natVal' @n
-      err = show x <> " does not satisfy <= " <> show n'
-
--- | Predicate for @x = 'LessThan' n@ implies \(x < n \).
---
--- ==== __Examples__
--- >>> satisfies @(LessThan 5) Proxy 4
--- Nothing
---
--- >>> satisfies @(LessThan 5) Proxy 5
--- Just (MkRefineException {predRep = LessThan 5, targetRep = Integer, msg = "5 does not satisfy < 5"})
---
--- @since 0.1.0.0
-type LessThan :: Nat -> Type
-data LessThan n
-
--- | @since 0.1.0.0
-instance
-  forall n a.
-  (KnownNat n, Num a, Ord a, Show a, Typeable a) =>
-  Predicate (LessThan n) a
+  Predicate (NatLT n) a
   where
   satisfies _ x
     | x < n' = Nothing
-    | otherwise = Just $ PC.mkRefineException @(LessThan n) @a err
+    | otherwise = Just $ PC.mkRefineException @(NatLT n) @a err
     where
       n' = fromIntegral $ natVal' @n
       err = show x <> " does not satisfy < " <> show n'

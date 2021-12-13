@@ -19,7 +19,7 @@ import Refined.Predicate.Class (Predicate (..))
 import Refined.Predicate.Class qualified as PC
 
 -- $setup
--- >>> import Refined.Predicate.Math
+-- >>> import Refined.Predicate.Nat
 
 -- | Logical negation.
 --
@@ -28,7 +28,7 @@ import Refined.Predicate.Class qualified as PC
 -- Nothing
 --
 -- >>> satisfies (Proxy @(Not Positive)) 7
--- Just (MkRefineException {predRep = Not (GreaterThan 0), targetRep = Integer, msg = "7 does not satisfy (Not (GreaterThan 0))"})
+-- Just (MkRefineException {predRep = Not (NatGT 0), targetRep = Integer, msg = "7 does not satisfy (Not (NatGT 0))"})
 --
 -- @since 0.1.0.0
 type Not :: Type -> Type
@@ -56,7 +56,7 @@ instance
 -- Nothing
 --
 -- >>> satisfies @(Or NonZero Positive) Proxy 0
--- Just (MkRefineException {predRep = Or (Not (NatEquals 0)) (GreaterThan 0), targetRep = Integer, msg = "0 satisfied neither predicate"})
+-- Just (MkRefineException {predRep = Or (Not (NatEq 0)) (NatGT 0), targetRep = Integer, msg = "0 satisfied neither predicate"})
 --
 -- @since 0.1.0.0
 type Or :: Type -> Type -> Type
@@ -97,10 +97,10 @@ infixr 2 \/
 -- Nothing
 --
 -- >>> satisfies @(Xor NonZero Positive) Proxy 7
--- Just (MkRefineException {predRep = Xor (Not (NatEquals 0)) (GreaterThan 0), targetRep = Integer, msg = "7 satisfied both predicates"})
+-- Just (MkRefineException {predRep = Xor (Not (NatEq 0)) (NatGT 0), targetRep = Integer, msg = "7 satisfied both predicates"})
 --
 -- >>> satisfies @(Xor NonZero Positive) Proxy 0
--- Just (MkRefineException {predRep = Xor (Not (NatEquals 0)) (GreaterThan 0), targetRep = Integer, msg = "0 satisfied neither predicate"})
+-- Just (MkRefineException {predRep = Xor (Not (NatEq 0)) (NatGT 0), targetRep = Integer, msg = "0 satisfied neither predicate"})
 --
 -- @since 0.1.0.0
 type Xor :: Type -> Type -> Type

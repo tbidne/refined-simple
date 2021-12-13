@@ -15,7 +15,7 @@ module Refined.Predicate
     type (<+>),
 
     -- * Built-in Predicates
-    module Refined.Predicate.Math,
+    module Refined.Predicate.Nat,
     module Refined.Predicate.Foldable,
     module Refined.Predicate.Text,
   )
@@ -24,6 +24,6 @@ where
 import Refined.Predicate.Class (Predicate (..))
 import Refined.Predicate.Class qualified as PC
 import Refined.Predicate.Foldable
-import Refined.Predicate.Math
+import Refined.Predicate.Nat
 import Refined.Predicate.Operators
 import Refined.Predicate.Text

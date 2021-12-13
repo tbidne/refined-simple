@@ -42,7 +42,7 @@ module Refined
     PredNotFound,
 
     -- ** Built-In
-    module Refined.Predicate.Math,
+    module Refined.Predicate.Nat,
     module Refined.Predicate.Foldable,
     module Refined.Predicate.Text,
 
@@ -75,7 +75,7 @@ import Refined.Predicate
   )
 import Refined.Predicate qualified as P
 import Refined.Predicate.Foldable
-import Refined.Predicate.Math
+import Refined.Predicate.Nat
 import Refined.Predicate.Text
 
 -- $setup
@@ -105,7 +105,7 @@ refineEmpty = UnsafeRefined
 -- Right (UnsafeRefined {unrefine = 5})
 --
 -- >>> refine @Positive 0
--- Left (MkRefineException {predRep = GreaterThan 0, targetRep = Integer, msg = "0 does not satisfy > 0"})
+-- Left (MkRefineException {predRep = NatGT 0, targetRep = Integer, msg = "0 does not satisfy > 0"})
 --
 -- @since 0.1.0.0
 refine :: forall p a. Predicate p a => a -> Either RefineException (Refined '[p] a)
@@ -117,16 +117,15 @@ refine x = case satisfies @p Proxy x of
 -- encountered, if any.
 --
 -- ==== __Examples__
--- >>> let x = refineAll @'[Positive, Odd, (GreaterThan 2)] @Int 5
+-- >>> let x = refineAll @'[Positive, Odd, (NatGT 2)] @Int 5
 -- >>> :type x
--- x :: Either
---        RefineException (Refined '[Positive, Odd, GreaterThan 2] Int)
+-- x :: Either RefineException (Refined '[Positive, Odd, NatGT 2] Int)
 --
 -- >>> x
 -- Right (UnsafeRefined {unrefine = 5})
 --
--- >>> refineAll @'[Positive, Odd, GreaterThan 6] @Int 5
--- Left (MkRefineException {predRep = GreaterThan 6, targetRep = Int, msg = "5 does not satisfy > 6"})
+-- >>> refineAll @'[Positive, Odd, NatGT 6] @Int 5
+-- Left (MkRefineException {predRep = NatGT 6, targetRep = Int, msg = "5 does not satisfy > 6"})
 --
 --
 -- @since 0.1.0.0
@@ -208,7 +207,8 @@ unsafeRefineAll x = case satisfies @(Proxy ps) Proxy x of
 -- >>>     y = addPred @NonZero x
 -- >>> :type y
 -- y :: Either
---        RefineException (Refined '[GreaterThanEq 0, Not (NatEquals 0)] Int)
+--        RefineException
+--        (Refined '[Or (NatGT 0) (NatEq 0), Not (NatEq 0)] Int)
 --
 -- >>> y
 -- Right (UnsafeRefined {unrefine = 7})
@@ -230,7 +230,7 @@ addPred (MkRefined x) = case satisfies @p Proxy x of
 -- >>> let x = unsafeRefine @NonNegative @Int 7
 -- >>>     y = unsafeAddPred @NonZero x
 -- >>> :type y
--- y :: Refined '[GreaterThanEq 0, Not (NatEquals 0)] Int
+-- y :: Refined '[Or (NatGT 0) (NatEq 0), Not (NatEq 0)] Int
 --
 -- >>> y
 -- UnsafeRefined {unrefine = 7}
@@ -259,7 +259,7 @@ relax (MkRefined x) = UnsafeRefined x
 -- >>> let x = unsafeRefine @Even @Int 8
 -- >>>     y = unsafeAddPred @Positive x
 -- >>> :type y
--- y :: Refined '[Even, GreaterThan 0] Int
+-- y :: Refined '[Even, NatGT 0] Int
 --
 -- >>> :type (relaxAll y)
 -- (relaxAll y) :: Refined '[] Int
